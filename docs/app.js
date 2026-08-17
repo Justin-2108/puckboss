@@ -1,27 +1,305 @@
-import {initializeApp} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,updateProfile,signOut} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-import {getFirestore,doc,setDoc,getDoc,addDoc,collection,getDocs,query,where,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-import {firebaseConfig} from "./firebase-config.js";
-const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);let games=[],user=null,leagues=[],league=null,register=false,showCode=false;
-const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#039;'}[c]));const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-const makeCode=()=>Array.from({length:8},()=>chars[Math.floor(Math.random()*chars.length)]).join("");const locked=g=>new Date(g.dateTime||g.date)<=new Date();
-async function loadGames(){try{games=await(await fetch("data/games.json?"+Date.now(),{cache:"no-store"})).json()}catch{games=[];toast("Spielplan konnte nicht geladen werden.")}}
-function toast(t){const e=$("toast");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",2500)}
-async function memberships(){leagues=[];const s=await getDocs(query(collection(db,"leagueMembers"),where("uid","==",user.uid)));for(const m of s.docs){const l=await getDoc(doc(db,"leagues",m.data().leagueId));if(l.exists())leagues.push({id:l.id,...l.data()})}if(!league&&leagues.length)league=leagues[0]}
-async function createLeague(name){name=name.trim();if(name.length<3)throw Error("Der Liganame muss mindestens 3 Zeichen lang sein.");let c=makeCode();while((await getDoc(doc(db,"leagueCodes",c))).exists())c=makeCode();const r=await addDoc(collection(db,"leagues"),{name,code:c,ownerUid:user.uid,createdAt:serverTimestamp()});await setDoc(doc(db,"leagueCodes",c),{leagueId:r.id});await setDoc(doc(db,"leagueMembers",`${user.uid}_${r.id}`),{uid:user.uid,leagueId:r.id,displayName:user.displayName||user.email.split("@")[0],joinedAt:serverTimestamp()});league={id:r.id,name,code:c,ownerUid:user.uid};showCode=true;await memberships();await renderLeague();toast("Liga erstellt.")}
-async function joinLeague(raw){const c=raw.trim().toUpperCase();if(c.length!==8)throw Error("Der Einladungscode muss 8 Zeichen haben.");const s=await getDoc(doc(db,"leagueCodes",c));if(!s.exists())throw Error("Einladungscode nicht gefunden.");const l=await getDoc(doc(db,"leagues",s.data().leagueId));if(!l.exists())throw Error("Liga nicht gefunden.");await setDoc(doc(db,"leagueMembers",`${user.uid}_${l.id}`),{uid:user.uid,leagueId:l.id,displayName:user.displayName||user.email.split("@")[0],joinedAt:serverTimestamp()});league={id:l.id,...l.data()};showCode=false;await memberships();await renderLeague();toast("Liga beigetreten.")}
-async function getTips(){if(!league)return{};const s=await getDoc(doc(db,"leagueTips",league.id,"users",user.uid));return s.exists()?s.data().tips||{}:{}}
-async function saveTips(t){await setDoc(doc(db,"leagueTips",league.id,"users",user.uid),{uid:user.uid,displayName:user.displayName||user.email.split("@")[0],tips:t,updatedAt:serverTimestamp()})}
-function points(t,g){if(!t||t.home==null||t.away==null||g.homeScore==null)return 0;if(t.home===g.homeScore&&t.away===g.awayScore)return 3;if(t.home-t.away===g.homeScore-g.awayScore)return 2;return Math.sign(t.home-t.away)===Math.sign(g.homeScore-g.awayScore)?1:0}
-function byDate(){const m=new Map();for(const g of games){const d=(g.date||g.dateTime).slice(0,10);if(!m.has(d))m.set(d,[]);m.get(d).push(g)}for(const list of m.values())list.sort((a,b)=>new Date(a.dateTime||`${a.date}T${a.time||"00:00"}`)-new Date(b.dateTime||`${b.date}T${b.time||"00:00"}`));return m}
-async function renderTips(){if(!league){$("tipsView").innerHTML='<div class="card">Erstelle zuerst eine Liga oder tritt einer Liga bei.</div>';return}const t=await getTips();let h="";for(const[d,list]of byDate()){h+=`<div class="gameGroup"><h2>${new Date(d+"T12:00:00").toLocaleDateString("de-DE",{weekday:"long",day:"2-digit",month:"2-digit",year:"numeric"})}</h2><div class="gameList">`;for(const g of list){const v=t[g.id]||{},l=locked(g);h+=`<div class="game"><div class="date"><b>${esc((g.time||g.dateTime?.slice(11,16))||"")}</b><small>Spiel ${esc(g.round)}</small></div><div class="teams"><span>${esc(g.home)}</span><span class="vs">vs.</span><span>${esc(g.away)}</span></div><div class="score">${l?`<div class="locked">${g.homeScore!=null?`Endstand <b>${g.homeScore}:${g.awayScore}</b>`:"Tipp geschlossen"}</div>`:`<input type="number" min="0" max="30" data-id="${g.id}" data-side="home" value="${v.home??""}" aria-label="${esc(g.home)} Tore"><b>:</b><input type="number" min="0" max="30" data-id="${g.id}" data-side="away" value="${v.away??""}" aria-label="${esc(g.away)} Tore">`}</div></div>`}h+=`</div></div>`}h+=`<div class="save"><button class="primary" id="saveAll">Tipps speichern</button></div>`;$("tipsView").innerHTML=h;$("saveAll").onclick=async()=>{const n={...t};document.querySelectorAll("#tipsView input").forEach(i=>{n[i.dataset.id]??={};n[i.dataset.id][i.dataset.side]=Number(i.value)});await saveTips(n);toast("Tipps gespeichert.");await stats()}}
-async function rows(){if(!league)return[];const s=await getDocs(query(collection(db,"leagueMembers"),where("leagueId","==",league.id))),r=[];for(const m of s.docs){const x=m.data(),z=await getDoc(doc(db,"leagueTips",league.id,"users",x.uid)),t=z.exists()?z.data().tips||{}:{};let p=0,c=0;for(const g of games){p+=points(t[g.id],g);if(t[g.id]?.home!=null)c++}r.push({uid:x.uid,name:x.displayName||"PuckBoss",points:p,count:c})}return r.sort((a,b)=>b.points-a.points||b.count-a.count||a.name.localeCompare(b.name))}
-async function renderTable(){const r=await rows();$("tableView").innerHTML=`<div class="card"><h2>${esc(league?.name||"Rangliste")}</h2><table class="table"><thead><tr><th>#</th><th>PuckBoss</th><th>Punkte</th><th>Tipps</th></tr></thead><tbody>${r.map((x,i)=>`<tr class="${x.uid===user.uid?'me':''}"><td>${i+1}</td><td>${esc(x.name)}</td><td><b>${x.points}</b></td><td>${x.count}</td></tr>`).join("")}</tbody></table></div>`}
-async function renderResults(){const t=await getTips(),done=games.filter(g=>g.homeScore!=null);$("resultsView").innerHTML=done.length?`<div class="card"><h2>Ergebnisse</h2>${done.slice().reverse().map(g=>`<div class="result"><div>${esc(g.date||"")}<small>${esc(g.time||"")}</small></div><div class="teams">${esc(g.home)} <span class="vs">vs.</span> ${esc(g.away)}<br><b>${g.homeScore}:${g.awayScore}</b></div><div>${t[g.id]?.home!=null?`Tipp ${t[g.id].home}:${t[g.id].away}<br><b>${points(t[g.id],g)} Punkte</b>`:"Kein Tipp"}</div></div>`).join("")}</div>`:'<div class="card">Noch keine Ergebnisse vorhanden.</div>'}
-async function stats(){if(!league){$("tipCount").textContent=0;$("points").textContent=0;$("rank").textContent="–";return}const t=await getTips(),r=await rows();$("tipCount").textContent=Object.keys(t).length;$("points").textContent=games.reduce((s,g)=>s+points(t[g.id],g),0);const i=r.findIndex(x=>x.uid===user.uid);$("rank").textContent=i<0?"–":i+1}
-async function renderLeague(){const s=$("leagueSelect");s.innerHTML=leagues.map(l=>`<option value="${l.id}">${esc(l.name)}</option>`).join("");if(league)s.value=league.id;$("leagueName").textContent=league?.name||"Keine Liga";$("leagueCode").textContent=showCode&&league?league.code:"••••••••";$("leagueBox").classList.toggle("hidden",!league);$("toggleCode").textContent=showCode?"Verbergen":"Anzeigen";await renderTips();await stats()}
-function view(v){["tips","table","results"].forEach(x=>$(x+"View").classList.toggle("hidden",x!==v));document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("active",b.dataset.view===v));if(v==="tips")renderTips();if(v==="table")renderTable();if(v==="results")renderResults()}
-function mode(v){register=v;$("loginTab").classList.toggle("active",!v);$("registerTab").classList.toggle("active",v);$("nameWrap").classList.toggle("hidden",!v);$("authSubmit").textContent=v?"Registrieren":"Anmelden"}
-$("loginTab").onclick=()=>mode(false);$("registerTab").onclick=()=>mode(true);$("logoutBtn").onclick=async()=>{showCode=false;league=null;leagues=[];await signOut(auth)};$("createLeague").onclick=async()=>{try{await createLeague($("newLeagueName").value);$("newLeagueName").value=""}catch(e){$("leagueMessage").textContent=e.message)}};$("joinLeague").onclick=async()=>{try{await joinLeague($("joinCode").value);$("joinCode").value=""}catch(e){$("leagueMessage").textContent=e.message}};$("toggleCode").onclick=async()=>{showCode=!showCode;await renderLeague()};$("copyCode").onclick=async()=>{if(!league)return;if(!showCode){showCode=true;await renderLeague()}await navigator.clipboard.writeText(league.code);toast("Einladungscode kopiert.")};$("leagueSelect").onchange=async e=>{league=leagues.find(l=>l.id===e.target.value)||null;showCode=false;await renderLeague()};document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>view(b.dataset.view));
-$("authForm").onsubmit=async e=>{e.preventDefault();try{if(register){const c=await createUserWithEmailAndPassword(auth,$("email").value,$("password").value);await updateProfile(c.user,{displayName:$("displayName").value.trim()||"PuckBoss"})}else await signInWithEmailAndPassword(auth,$("email").value,$("password").value)}catch(err){$("authMessage").textContent=err.message.replace("Firebase: ","")}};
-onAuthStateChanged(auth,async u=>{user=u;showCode=false;await loadGames();if(u){$("authCard").classList.add("hidden");$("app").classList.remove("hidden");$("logoutBtn").classList.remove("hidden");$("userLabel").textContent=u.displayName||u.email;await memberships();await renderLeague()}else{$("authCard").classList.remove("hidden");$("app").classList.add("hidden");$("logoutBtn").classList.add("hidden");$("userLabel").textContent=""}});
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, addDoc, collection, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { firebaseConfig } from "./firebase-config.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+let games = [];
+let user = null;
+let leagues = [];
+let league = null;
+let register = false;
+let showCode = false;
+const $ = (id) => document.getElementById(id);
+
+function esc(value) {
+  return String(value == null ? "" : value).replace(/[&<>\"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#039;"
+  }[c]));
+}
+
+function toast(message) {
+  const el = $("toast");
+  if (!el) return;
+  el.textContent = message;
+  el.style.display = "block";
+  setTimeout(() => { el.style.display = "none"; }, 2500);
+}
+
+function makeCode() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+function gameDate(game) {
+  if (game.dateTime) return new Date(game.dateTime);
+  return new Date((game.date || "") + "T" + (game.time || "00:00"));
+}
+
+function locked(game) { return gameDate(game) <= new Date(); }
+
+async function loadGames() {
+  try {
+    const response = await fetch("data/games.json?v=" + Date.now(), { cache: "no-store" });
+    games = await response.json();
+  } catch (error) {
+    games = [];
+    console.error(error);
+    toast("Spielplan konnte nicht geladen werden.");
+  }
+}
+
+async function loadMemberships() {
+  leagues = [];
+  const snapshot = await getDocs(query(collection(db, "leagueMembers"), where("uid", "==", user.uid)));
+  for (const member of snapshot.docs) {
+    const data = member.data();
+    const leagueSnapshot = await getDoc(doc(db, "leagues", data.leagueId));
+    if (leagueSnapshot.exists()) leagues.push({ id: leagueSnapshot.id, ...leagueSnapshot.data() });
+  }
+  if (!league && leagues.length) league = leagues[0];
+}
+
+async function createLeague(name) {
+  name = name.trim();
+  if (name.length < 3) throw new Error("Der Liganame muss mindestens 3 Zeichen lang sein.");
+  let code = makeCode();
+  while ((await getDoc(doc(db, "leagueCodes", code))).exists()) code = makeCode();
+  const ref = await addDoc(collection(db, "leagues"), { name, code, ownerUid: user.uid, createdAt: serverTimestamp() });
+  await setDoc(doc(db, "leagueCodes", code), { leagueId: ref.id });
+  await setDoc(doc(db, "leagueMembers", user.uid + "_" + ref.id), {
+    uid: user.uid, leagueId: ref.id, displayName: user.displayName || user.email.split("@")[0], joinedAt: serverTimestamp()
+  });
+  league = { id: ref.id, name, code, ownerUid: user.uid };
+  showCode = true;
+  await loadMemberships();
+  await renderLeague();
+  toast("Liga erstellt.");
+}
+
+async function joinLeague(input) {
+  const code = input.trim().toUpperCase();
+  if (code.length !== 8) throw new Error("Der Einladungscode muss 8 Zeichen haben.");
+  const codeSnapshot = await getDoc(doc(db, "leagueCodes", code));
+  if (!codeSnapshot.exists()) throw new Error("Einladungscode nicht gefunden.");
+  const leagueId = codeSnapshot.data().leagueId;
+  const leagueSnapshot = await getDoc(doc(db, "leagues", leagueId));
+  if (!leagueSnapshot.exists()) throw new Error("Liga nicht gefunden.");
+  const data = leagueSnapshot.data();
+  await setDoc(doc(db, "leagueMembers", user.uid + "_" + leagueId), {
+    uid: user.uid, leagueId, displayName: user.displayName || user.email.split("@")[0], joinedAt: serverTimestamp()
+  });
+  league = { id: leagueId, ...data };
+  showCode = false;
+  await loadMemberships();
+  await renderLeague();
+  toast("Liga beigetreten.");
+}
+
+async function getTips() {
+  if (!league) return {};
+  const snapshot = await getDoc(doc(db, "leagueTips", league.id, "users", user.uid));
+  return snapshot.exists() ? (snapshot.data().tips || {}) : {};
+}
+
+async function saveTips(tips) {
+  await setDoc(doc(db, "leagueTips", league.id, "users", user.uid), {
+    uid: user.uid, displayName: user.displayName || user.email.split("@")[0], tips, updatedAt: serverTimestamp()
+  });
+}
+
+function points(tip, game) {
+  if (!tip || tip.home == null || tip.away == null || game.homeScore == null) return 0;
+  if (tip.home === game.homeScore && tip.away === game.awayScore) return 3;
+  if (tip.home - tip.away === game.homeScore - game.awayScore) return 2;
+  return Math.sign(tip.home - tip.away) === Math.sign(game.homeScore - game.awayScore) ? 1 : 0;
+}
+
+function gamesByDay() {
+  const groups = new Map();
+  games.forEach((game) => {
+    const day = String(game.date || game.dateTime).slice(0, 10);
+    if (!groups.has(day)) groups.set(day, []);
+    groups.get(day).push(game);
+  });
+  groups.forEach((list) => list.sort((a, b) => gameDate(a) - gameDate(b)));
+  return groups;
+}
+
+function logo(team) {
+  const files = {
+    "Eisbären Berlin": "assets/teams/eisbaeren-berlin.svg",
+    "Straubing Tigers": "assets/teams/straubing-tigers.svg",
+    "Kölner Haie": "assets/teams/koelner-haie.svg",
+    "Grizzlys Wolfsburg": "assets/teams/grizzlys-wolfsburg.svg",
+    "Nürnberg Ice Tigers": "assets/teams/nuernberg-ice-tigers.svg",
+    "Augsburger Panther": "assets/teams/augsburger-panther.svg",
+    "Krefeld Pinguine": "assets/teams/krefeld-pinguine.svg",
+    "Pinguins Bremerhaven": "assets/teams/pinguins-bremerhaven.svg",
+    "Iserlohn Roosters": "assets/teams/iserlohn-roosters.svg",
+    "ERC Ingolstadt": "assets/teams/erc-ingolstadt.svg",
+    "EHC Red Bull München": "assets/teams/ehc-red-bull-muenchen.svg",
+    "Adler Mannheim": "assets/teams/adler-mannheim.svg",
+    "Schwenninger Wild Wings": "assets/teams/schwenninger-wild-wings.svg",
+    "Löwen Frankfurt": "assets/teams/loewen-frankfurt.svg"
+  };
+  return files[team] ? '<img class="team-logo" src="' + files[team] + '" alt="" onerror="this.style.display=\'none\'">' : "";
+}
+
+function team(teamName, right) {
+  const image = logo(teamName);
+  const name = '<span class="team-name">' + esc(teamName) + '</span>';
+  return right ? name + image : image + name;
+}
+
+async function renderTips() {
+  if (!league) {
+    $("tipsView").innerHTML = '<div class="card">Erstelle zuerst eine Liga oder tritt einer Liga bei.</div>';
+    return;
+  }
+  const tips = await getTips();
+  let html = "";
+  gamesByDay().forEach((list, day) => {
+    html += '<section class="gameGroup"><h2>' + new Date(day + "T12:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "2-digit", year: "numeric" }) + '</h2><div class="gameList">';
+    list.forEach((game) => {
+      const tip = tips[game.id] || {};
+      const time = game.time || (game.dateTime ? game.dateTime.slice(11, 16) : "");
+      html += '<div class="game"><div class="date"><b>' + esc(time) + '</b><small>Spiel ' + esc(game.round) + '</small></div>';
+      html += '<div class="teams"><span class="team home-team">' + team(game.home, true) + '</span><span class="vs">vs.</span><span class="team away-team">' + team(game.away, false) + '</span></div><div class="score">';
+      if (locked(game)) {
+        html += '<div class="locked">' + (game.homeScore != null ? 'Endstand <b>' + game.homeScore + ':' + game.awayScore + '</b>' : 'Tipp geschlossen') + '</div>';
+      } else {
+        html += '<input type="number" min="0" max="30" data-id="' + esc(game.id) + '" data-side="home" value="' + (tip.home == null ? "" : tip.home) + '"><b>:</b><input type="number" min="0" max="30" data-id="' + esc(game.id) + '" data-side="away" value="' + (tip.away == null ? "" : tip.away) + '">';
+      }
+      html += '</div></div>';
+    });
+    html += '</div></section>';
+  });
+  html += '<div class="save"><button class="primary" id="saveAll">Tipps speichern</button></div>';
+  $("tipsView").innerHTML = html;
+  $("saveAll").onclick = async () => {
+    const updated = Object.assign({}, tips);
+    document.querySelectorAll("#tipsView input").forEach((input) => {
+      if (!updated[input.dataset.id]) updated[input.dataset.id] = {};
+      updated[input.dataset.id][input.dataset.side] = Number(input.value);
+    });
+    try { await saveTips(updated); toast("Tipps gespeichert."); await updateStats(); }
+    catch (error) { console.error(error); toast("Tipps konnten nicht gespeichert werden."); }
+  };
+}
+
+async function ranking() {
+  if (!league) return [];
+  const snapshot = await getDocs(query(collection(db, "leagueMembers"), where("leagueId", "==", league.id)));
+  const result = [];
+  for (const member of snapshot.docs) {
+    const data = member.data();
+    const tipSnapshot = await getDoc(doc(db, "leagueTips", league.id, "users", data.uid));
+    const tips = tipSnapshot.exists() ? (tipSnapshot.data().tips || {}) : {};
+    let total = 0;
+    let count = 0;
+    games.forEach((game) => { total += points(tips[game.id], game); if (tips[game.id] && tips[game.id].home != null && tips[game.id].away != null) count++; });
+    result.push({ uid: data.uid, name: data.displayName || "PuckBoss", points: total, count });
+  }
+  result.sort((a, b) => b.points - a.points || b.count - a.count || a.name.localeCompare(b.name));
+  return result;
+}
+
+async function renderTable() {
+  const list = await ranking();
+  $("tableView").innerHTML = '<div class="card"><h2>' + esc(league ? league.name : "Rangliste") + '</h2><table class="table"><thead><tr><th>#</th><th>PuckBoss</th><th>Punkte</th><th>Tipps</th></tr></thead><tbody>' + list.map((entry, i) => '<tr class="' + (entry.uid === user.uid ? "me" : "") + '"><td>' + (i + 1) + '</td><td>' + esc(entry.name) + '</td><td><b>' + entry.points + '</b></td><td>' + entry.count + '</td></tr>').join("") + '</tbody></table></div>';
+}
+
+async function renderResults() {
+  const tips = await getTips();
+  const done = games.filter((game) => game.homeScore != null);
+  if (!done.length) { $("resultsView").innerHTML = '<div class="card">Noch keine Ergebnisse vorhanden.</div>'; return; }
+  $("resultsView").innerHTML = '<div class="card"><h2>Ergebnisse</h2>' + done.slice().reverse().map((game) => '<div class="result"><div>' + esc(game.date || "") + '<small>' + esc(game.time || "") + '</small></div><div class="teams"><span class="team">' + team(game.home, true) + '</span><span class="vs">vs.</span><span class="team">' + team(game.away, false) + '</span><br><b>' + game.homeScore + ':' + game.awayScore + '</b></div><div>' + (tips[game.id] ? 'Tipp ' + tips[game.id].home + ':' + tips[game.id].away + '<br><b>' + points(tips[game.id], game) + ' Punkte</b>' : 'Kein Tipp') + '</div></div>').join("") + '</div>';
+}
+
+async function updateStats() {
+  if (!league) { $("tipCount").textContent = "0"; $("points").textContent = "0"; $("rank").textContent = "–"; return; }
+  const tips = await getTips();
+  const list = await ranking();
+  let total = 0;
+  games.forEach((game) => { total += points(tips[game.id], game); });
+  $("tipCount").textContent = Object.keys(tips).length;
+  $("points").textContent = total;
+  const position = list.findIndex((entry) => entry.uid === user.uid);
+  $("rank").textContent = position < 0 ? "–" : String(position + 1);
+}
+
+async function renderLeague() {
+  $("leagueSelect").innerHTML = leagues.map((item) => '<option value="' + item.id + '">' + esc(item.name) + '</option>').join("");
+  if (league) $("leagueSelect").value = league.id;
+  $("leagueName").textContent = league ? league.name : "Keine Liga";
+  $("leagueCode").textContent = showCode && league ? league.code : "••••••••";
+  $("leagueBox").classList.toggle("hidden", !league);
+  $("toggleCode").textContent = showCode ? "Verbergen" : "Anzeigen";
+  await renderTips();
+  await updateStats();
+}
+
+function view(name) {
+  ["tips", "table", "results"].forEach((item) => $(item + "View").classList.toggle("hidden", item !== name));
+  document.querySelectorAll(".nav").forEach((button) => button.classList.toggle("active", button.dataset.view === name));
+  if (name === "tips") renderTips();
+  if (name === "table") renderTable();
+  if (name === "results") renderResults();
+}
+
+function authMode(value) {
+  register = value;
+  $("loginTab").classList.toggle("active", !value);
+  $("registerTab").classList.toggle("active", value);
+  $("nameWrap").classList.toggle("hidden", !value);
+  $("authSubmit").textContent = value ? "Registrieren" : "Anmelden";
+}
+
+$("loginTab").onclick = () => authMode(false);
+$("registerTab").onclick = () => authMode(true);
+$("authForm").onsubmit = async (event) => {
+  event.preventDefault();
+  $("authMessage").textContent = "";
+  try {
+    if (register) {
+      const credential = await createUserWithEmailAndPassword(auth, $("email").value, $("password").value);
+      await updateProfile(credential.user, { displayName: $("displayName").value.trim() || "PuckBoss" });
+    } else {
+      await signInWithEmailAndPassword(auth, $("email").value, $("password").value);
+    }
+  } catch (error) {
+    console.error(error);
+    $("authMessage").textContent = error.message.replace("Firebase: ", "");
+  }
+};
+$("logoutBtn").onclick = async () => { showCode = false; league = null; leagues = []; await signOut(auth); };
+$("createLeague").onclick = async () => { try { await createLeague($("newLeagueName").value); $("newLeagueName").value = ""; } catch (error) { $("leagueMessage").textContent = error.message; } };
+$("joinLeague").onclick = async () => { try { await joinLeague($("joinCode").value); $("joinCode").value = ""; } catch (error) { $("leagueMessage").textContent = error.message; } };
+$("toggleCode").onclick = async () => { showCode = !showCode; await renderLeague(); };
+$("copyCode").onclick = async () => { if (!league) return; await navigator.clipboard.writeText(league.code); showCode = true; await renderLeague(); toast("Einladungscode kopiert."); };
+$("leagueSelect").onchange = async (event) => { league = leagues.find((item) => item.id === event.target.value) || null; showCode = false; await renderLeague(); };
+document.querySelectorAll(".nav").forEach((button) => { button.onclick = () => view(button.dataset.view); });
+
+onAuthStateChanged(auth, async (loggedInUser) => {
+  user = loggedInUser;
+  showCode = false;
+  await loadGames();
+  if (!user) {
+    $("authCard").classList.remove("hidden");
+    $("app").classList.add("hidden");
+    $("logoutBtn").classList.add("hidden");
+    $("userLabel").textContent = "";
+    return;
+  }
+  $("authCard").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  $("logoutBtn").classList.remove("hidden");
+  $("userLabel").textContent = user.displayName || user.email;
+  try { await loadMemberships(); await renderLeague(); }
+  catch (error) { console.error(error); $("leagueMessage").textContent = "Ligen konnten nicht geladen werden."; }
+});
