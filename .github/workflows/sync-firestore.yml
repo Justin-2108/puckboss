@@ -1,0 +1,25 @@
+name: Sync schedule to Firestore
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Update official PENNY DEL schedule"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install google-cloud-firestore google-auth
+      - name: Sync games to Firestore
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: python scripts/sync_firestore.py
