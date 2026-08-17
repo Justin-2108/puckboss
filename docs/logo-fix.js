@@ -15,7 +15,11 @@ const TEAM_LOGOS = {
   "Löwen Frankfurt": "assets/teams/frankfurt.svg"
 };
 
+let observer;
+
 function applyTeamLogos() {
+  observer.disconnect();
+
   document.querySelectorAll(".team").forEach((teamElement) => {
     const nameElement = teamElement.querySelector(".team-name");
     if (!nameElement) return;
@@ -42,8 +46,10 @@ function applyTeamLogos() {
       nameElement.before(image);
     }
   });
+
+  observer.observe(document.body, { childList: true, subtree: true });
 }
 
-const observer = new MutationObserver(applyTeamLogos);
+observer = new MutationObserver(applyTeamLogos);
 observer.observe(document.body, { childList: true, subtree: true });
 applyTeamLogos();
