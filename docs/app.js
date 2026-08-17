@@ -12,6 +12,7 @@ let leagues = [];
 let league = null;
 let register = false;
 let showCode = false;
+let tipRefreshTimer = null;
 const $ = (id) => document.getElementById(id);
 
 function esc(value) {
@@ -37,10 +38,43 @@ function makeCode() {
 
 function gameDate(game) {
   if (game.dateTime) return new Date(game.dateTime);
-  return new Date((game.date || "") + "T" + (game.time || "00:00"));
+  if (game.date) {
+    if (String(game.date).includes("T")) return new Date(game.date);
+    return new Date(game.date + "T" + (game.time || "00:00"));
+  }
+  return new Date("");
 }
 
-function locked(game) { return gameDate(game) <= new Date(); }
+function gameTime(game) {
+  if (game.time) return game.time;
+  const date = game.dateTime || game.date;
+  if (!date || !String(date).includes("T")) return "";
+  const match = String(date).match(/T(\d{2}:\d{2})/);
+  return match ? match[1] : "";
+}
+
+function locked(game) {
+  return gameDate(game).getTime() <= Date.now();
+}
+
+function scheduleTipRefresh() {
+  if (tipRefreshTimer) clearTimeout(tipRefreshTimer);
+  tipRefreshTimer = null;
+  if (!league) return;
+
+  const upcoming = games
+    .map(gameDate)
+    .filter((date) => !Number.isNaN(date.getTime()) && date.getTime() > Date.now())
+    .sort((a, b) => a - b)[0];
+
+  if (!upcoming) return;
+
+  const delay = Math.max(250, upcoming.getTime() - Date.now() + 250);
+  tipRefreshTimer = setTimeout(async () => {
+    tipRefreshTimer = null;
+    if (league) await renderTips();
+  }, delay);
+}
 
 async function loadGames() {
   try {
@@ -159,6 +193,7 @@ function team(teamName, right) {
 async function renderTips() {
   if (!league) {
     $("tipsView").innerHTML = '<div class="card">Erstelle zuerst eine Liga oder tritt einer Liga bei.</div>';
+    scheduleTipRefresh();
     return;
   }
   const tips = await getTips();
@@ -167,7 +202,7 @@ async function renderTips() {
     html += '<section class="gameGroup"><h2>' + new Date(day + "T12:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "2-digit", year: "numeric" }) + '</h2><div class="gameList">';
     list.forEach((game) => {
       const tip = tips[game.id] || {};
-      const time = game.time || (game.dateTime ? game.dateTime.slice(11, 16) : "");
+      const time = gameTime(game);
       html += '<div class="game"><div class="date"><b>' + esc(time) + '</b><small>Spiel ' + esc(game.round) + '</small></div>';
       html += '<div class="teams"><span class="team home-team">' + team(game.home, true) + '</span><span class="vs">vs.</span><span class="team away-team">' + team(game.away, false) + '</span></div><div class="score">';
       if (locked(game)) {
@@ -190,6 +225,7 @@ async function renderTips() {
     try { await saveTips(updated); toast("Tipps gespeichert."); await updateStats(); }
     catch (error) { console.error(error); toast("Tipps konnten nicht gespeichert werden."); }
   };
+  scheduleTipRefresh();
 }
 
 async function ranking() {
@@ -218,7 +254,7 @@ async function renderResults() {
   const tips = await getTips();
   const done = games.filter((game) => game.homeScore != null);
   if (!done.length) { $("resultsView").innerHTML = '<div class="card">Noch keine Ergebnisse vorhanden.</div>'; return; }
-  $("resultsView").innerHTML = '<div class="card"><h2>Ergebnisse</h2>' + done.slice().reverse().map((game) => '<div class="result"><div>' + esc(game.date || "") + '<small>' + esc(game.time || "") + '</small></div><div class="teams"><span class="team">' + team(game.home, true) + '</span><span class="vs">vs.</span><span class="team">' + team(game.away, false) + '</span><br><b>' + game.homeScore + ':' + game.awayScore + '</b></div><div>' + (tips[game.id] ? 'Tipp ' + tips[game.id].home + ':' + tips[game.id].away + '<br><b>' + points(tips[game.id], game) + ' Punkte</b>' : 'Kein Tipp') + '</div></div>').join("") + '</div>';
+  $("resultsView").innerHTML = '<div class="card"><h2>Ergebnisse</h2>' + done.slice().reverse().map((game) => '<div class="result"><div>' + esc(game.date || "") + '<small>' + esc(gameTime(game)) + '</small></div><div class="teams"><span class="team">' + team(game.home, true) + '</span><span class="vs">vs.</span><span class="team">' + team(game.away, false) + '</span><br><b>' + game.homeScore + ':' + game.awayScore + '</b></div><div>' + (tips[game.id] ? 'Tipp ' + tips[game.id].home + ':' + tips[game.id].away + '<br><b>' + points(tips[game.id], game) + ' Punkte</b>' : 'Kein Tipp') + '</div></div>').join("") + '</div>';
 }
 
 async function updateStats() {
@@ -277,7 +313,7 @@ $("authForm").onsubmit = async (event) => {
     $("authMessage").textContent = error.message.replace("Firebase: ", "");
   }
 };
-$("logoutBtn").onclick = async () => { showCode = false; league = null; leagues = []; await signOut(auth); };
+$("logoutBtn").onclick = async () => { showCode = false; league = null; leagues = []; if (tipRefreshTimer) clearTimeout(tipRefreshTimer); tipRefreshTimer = null; await signOut(auth); };
 $("createLeague").onclick = async () => { try { await createLeague($("newLeagueName").value); $("newLeagueName").value = ""; } catch (error) { $("leagueMessage").textContent = error.message; } };
 $("joinLeague").onclick = async () => { try { await joinLeague($("joinCode").value); $("joinCode").value = ""; } catch (error) { $("leagueMessage").textContent = error.message; } };
 $("toggleCode").onclick = async () => { showCode = !showCode; await renderLeague(); };
