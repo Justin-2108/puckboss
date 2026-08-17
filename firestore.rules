@@ -12,8 +12,29 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/leagueMembers/$(request.auth.uid + '_' + leagueId));
     }
 
-    // Ligen: Angemeldete Benutzer dürfen Ligen lesen, damit Liga-Auswahl
-    // und Beitritt zuverlässig funktionieren. Änderungen darf nur der Besitzer.
+    // Server-side kickoff times for the games currently in games.json.
+    // The browser can never change these values.
+    function kickoff(gameId) {
+      return gameId == '2026-09-17_EBB_STR' ? timestamp.value(1789666200000) :
+        gameId == '2026-09-18_KHA_GW' ? timestamp.value(1789752600000) :
+        gameId == '2026-09-18_NIT_AEV' ? timestamp.value(1789752600000) :
+        gameId == '2026-09-18_KEV_PEB' ? timestamp.value(1789752600000) :
+        gameId == '2026-09-18_ISE_ING' ? timestamp.value(1789752600000) :
+        gameId == '2026-09-18_MUC_MAN' ? timestamp.value(1789752600000) :
+        gameId == '2026-09-18_SWW_LF' ? timestamp.value(1789752600000) :
+        timestamp.value(0);
+    }
+
+    function validTip() {
+      return request.resource.data.uid == request.auth.uid
+        && request.resource.data.home is int
+        && request.resource.data.away is int
+        && request.resource.data.home >= 0
+        && request.resource.data.home <= 30
+        && request.resource.data.away >= 0
+        && request.resource.data.away <= 30;
+    }
+
     match /leagues/{leagueId} {
       allow read: if signedIn();
       allow create: if signedIn()
@@ -22,8 +43,6 @@ service cloud.firestore {
         && resource.data.ownerUid == request.auth.uid;
     }
 
-    // Einladungscodes dürfen angemeldete Benutzer lesen und beim Erstellen
-    // einer eigenen Liga angelegt werden.
     match /leagueCodes/{code} {
       allow read: if signedIn();
       allow create: if signedIn()
@@ -31,9 +50,6 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // Mitgliedschaften werden für Liga-Auswahl und Rangliste benötigt.
-    // Ein Benutzer darf nur Mitgliedschaften mit seiner eigenen UID anlegen,
-    // ändern oder löschen.
     match /leagueMembers/{memberId} {
       allow read: if signedIn();
       allow create: if signedIn()
@@ -46,16 +62,28 @@ service cloud.firestore {
         && resource.data.uid == request.auth.uid;
     }
 
-    // Tipps: Nur Mitglieder einer Liga dürfen deren Tipps lesen.
-    // Schreiben/Ändern darf ausschließlich der jeweilige Benutzer selbst.
+    // Legacy tip document: readable for backwards compatibility, but no
+    // client may write to it anymore. New tips are stored per game below.
     match /leagueTips/{leagueId}/users/{uid} {
       allow read: if isMember(leagueId);
-      allow create, update, delete: if isMember(leagueId)
-        && uid == request.auth.uid
-        && request.resource.data.uid == request.auth.uid;
+      allow write: if false;
     }
 
-    // Alles andere bleibt gesperrt.
+    // One document per game makes the server-side lock enforceable.
+    // A tip can only be created or changed before the real server time reaches
+    // the corresponding puck drop. This cannot be bypassed by changing the
+    // browser clock or by sending a direct Firestore request.
+    match /leagueTips/{leagueId}/users/{uid}/games/{gameId} {
+      allow read: if isMember(leagueId);
+      allow create, update: if isMember(leagueId)
+        && uid == request.auth.uid
+        && request.time < kickoff(gameId)
+        && validTip();
+      allow delete: if isMember(leagueId)
+        && uid == request.auth.uid
+        && request.time < kickoff(gameId);
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
