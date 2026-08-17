@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isMember(leagueId) {
+      return signedIn() && exists(/databases/$(database)/documents/leagueMembers/$(request.auth.uid + '_' + leagueId));
+    }
+    match /leagues/{leagueId} {
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow get: if signedIn() && (resource.data.ownerUid == request.auth.uid || isMember(leagueId));
+      allow list: if signedIn();
+      allow update, delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+    }
+    match /leagueCodes/{code} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if signedIn() && request.resource.data.leagueId is string
+        && exists(/databases/$(database)/documents/leagues/$(request.resource.data.leagueId))
+        && get(/databases/$(database)/documents/leagues/$(request.resource.data.leagueId)).data.ownerUid == request.auth.uid;
+      allow update, delete: if false;
+    }
+    match /leagueMembers/{memberId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid
+        && request.resource.data.leagueId is string
+        && exists(/databases/$(database)/documents/leagues/$(request.resource.data.leagueId));
+      allow update: if signedIn() && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.leagueId == resource.data.leagueId;
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+    match /leagueTips/{leagueId}/users/{userId} {
+      allow get: if isMember(leagueId);
+      allow list: if false;
+      allow create, update: if isMember(leagueId) && userId == request.auth.uid
+        && request.resource.data.uid == request.auth.uid;
+      allow delete: if isMember(leagueId) && userId == request.auth.uid;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
