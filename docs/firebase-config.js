@@ -1,9 +1,10 @@
-// Firebase Console → Projekteinstellungen → Deine Apps → Web-App
+// Firebase-Konfiguration für PuckBoss
 export const firebaseConfig = {
-  apiKey: "DEIN_API_KEY",
-  authDomain: "DEIN_PROJEKT.firebaseapp.com",
-  projectId: "DEIN_PROJEKT",
-  storageBucket: "DEIN_PROJEKT.firebasestorage.app",
-  messagingSenderId: "DEINE_SENDER_ID",
-  appId: "DEINE_APP_ID"
+  apiKey: "AIzaSyDVkqdOIixYeoUZehz-QZoVA_JFpTnSJQs",
+  authDomain: "puckboss-7551e.firebaseapp.com",
+  projectId: "puckboss-7551e",
+  storageBucket: "puckboss-7551e.firebasestorage.app",
+  messagingSenderId: "760558139591",
+  appId: "1:760558139591:web:ff80cda47436f2133b26e2",
+  measurementId: "G-TVS1WM8YFK"
 };
