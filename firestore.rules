@@ -1,11 +1,63 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn(){ return request.auth != null; }
-    function isMember(id){ return signedIn() && exists(/databases/$(database)/documents/leagueMembers/$(request.auth.uid + '_' + id)); }
-    match /leagueCodes/{code}{ allow read: if signedIn(); allow create: if signedIn(); allow update,delete: if false; }
-    match /leagues/{id}{ allow read: if isMember(id) || (signedIn() && resource.data.ownerUid==request.auth.uid); allow create: if signedIn() && request.resource.data.ownerUid==request.auth.uid; allow update,delete: if signedIn() && resource.data.ownerUid==request.auth.uid; }
-    match /leagueMembers/{id}{ allow read: if signedIn() && (resource.data.uid==request.auth.uid || isMember(resource.data.leagueId)); allow create: if signedIn() && request.resource.data.uid==request.auth.uid; allow update,delete: if signedIn() && resource.data.uid==request.auth.uid; }
-    match /leagueTips/{leagueId}/users/{uid}{ allow read: if isMember(leagueId); allow create,update,delete: if isMember(leagueId) && uid==request.auth.uid; }
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isMember(leagueId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/leagueMembers/$(request.auth.uid + '_' + leagueId));
+    }
+
+    // Ligen: Angemeldete Benutzer dürfen Ligen lesen, damit Liga-Auswahl
+    // und Beitritt zuverlässig funktionieren. Änderungen darf nur der Besitzer.
+    match /leagues/{leagueId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid;
+      allow update, delete: if signedIn()
+        && resource.data.ownerUid == request.auth.uid;
+    }
+
+    // Einladungscodes dürfen angemeldete Benutzer lesen und beim Erstellen
+    // einer eigenen Liga angelegt werden.
+    match /leagueCodes/{code} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.leagueId is string;
+      allow update, delete: if false;
+    }
+
+    // Mitgliedschaften werden für Liga-Auswahl und Rangliste benötigt.
+    // Ein Benutzer darf nur Mitgliedschaften mit seiner eigenen UID anlegen,
+    // ändern oder löschen.
+    match /leagueMembers/{memberId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.leagueId is string;
+      allow update: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == request.auth.uid;
+      allow delete: if signedIn()
+        && resource.data.uid == request.auth.uid;
+    }
+
+    // Tipps: Nur Mitglieder einer Liga dürfen deren Tipps lesen.
+    // Schreiben/Ändern darf ausschließlich der jeweilige Benutzer selbst.
+    match /leagueTips/{leagueId}/users/{uid} {
+      allow read: if isMember(leagueId);
+      allow create, update, delete: if isMember(leagueId)
+        && uid == request.auth.uid
+        && request.resource.data.uid == request.auth.uid;
+    }
+
+    // Alles andere bleibt gesperrt.
+    match /{document=**} {
+      allow read, write: if false;
+    }
   }
 }
