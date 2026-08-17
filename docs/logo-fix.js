@@ -24,17 +24,22 @@ function applyTeamLogos() {
     const logoPath = TEAM_LOGOS[teamName];
     if (!logoPath) return;
 
+    teamElement.querySelectorAll(".team-logo").forEach((image) => image.remove());
+
     let image = teamElement.querySelector(".teamLogo");
     if (!image) {
       image = document.createElement("img");
       image.className = "teamLogo";
       image.alt = "";
       image.loading = "lazy";
-      teamElement.appendChild(image);
     }
 
-    if (image.getAttribute("src") !== logoPath) {
-      image.src = logoPath;
+    image.src = logoPath;
+
+    if (teamElement.classList.contains("home-team")) {
+      nameElement.after(image);
+    } else {
+      nameElement.before(image);
     }
   });
 }
