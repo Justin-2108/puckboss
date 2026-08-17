@@ -1,0 +1,11 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn(){ return request.auth != null; }
+    function isMember(id){ return signedIn() && exists(/databases/$(database)/documents/leagueMembers/$(request.auth.uid + '_' + id)); }
+    match /leagueCodes/{code}{ allow read: if signedIn(); allow create: if signedIn(); allow update,delete: if false; }
+    match /leagues/{id}{ allow read: if isMember(id) || (signedIn() && resource.data.ownerUid==request.auth.uid); allow create: if signedIn() && request.resource.data.ownerUid==request.auth.uid; allow update,delete: if signedIn() && resource.data.ownerUid==request.auth.uid; }
+    match /leagueMembers/{id}{ allow read: if signedIn() && (resource.data.uid==request.auth.uid || isMember(resource.data.leagueId)); allow create: if signedIn() && request.resource.data.uid==request.auth.uid; allow update,delete: if signedIn() && resource.data.uid==request.auth.uid; }
+    match /leagueTips/{leagueId}/users/{uid}{ allow read: if isMember(leagueId); allow create,update,delete: if isMember(leagueId) && uid==request.auth.uid; }
+  }
+}
