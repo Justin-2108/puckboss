@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#08101b">
+<title>PuckBoss – PENNY DEL Tippspiel</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><img src="assets/logo.svg" alt="PuckBoss"><div><b>PuckBoss</b><small>PENNY DEL Tippspiel 2026/27</small></div></div>
+  <div><span id="userLabel"></span> <button id="logoutBtn" class="ghost hidden">Abmelden</button></div>
+</header>
+<main>
+<section id="authCard" class="card auth">
+  <h1>Willkommen bei PuckBoss</h1><p>Tippen. Punkte sammeln. PuckBoss werden.</p>
+  <div class="tabs"><button id="loginTab" class="tab active">Anmelden</button><button id="registerTab" class="tab">Registrieren</button></div>
+  <form id="authForm"><label id="nameWrap" class="hidden">Anzeigename<input id="displayName" autocomplete="nickname"></label><label>E-Mail<input id="email" type="email" required></label><label>Passwort<input id="password" type="password" required minlength="6"></label><button class="primary" id="authSubmit">Anmelden</button></form><p id="authMessage" class="error"></p>
+</section>
+<section id="app" class="hidden">
+  <div class="hero card"><div><span>SAISON 2026/27</span><h1>PuckBoss</h1><p>Dein persönliches PENNY DEL Tippspiel.</p></div><div class="stats"><div><b id="tipCount">0</b><small>Tipps</small></div><div><b id="points">0</b><small>Punkte</small></div><div><b id="rank">–</b><small>Rang</small></div></div></div>
+  <section class="card league"><div class="leagueHead"><div><span>DEINE TIPP-LIGA</span><h2 id="leagueName">Keine Liga</h2></div><div id="leagueBox" class="code hidden"><small>Einladungscode</small><b id="leagueCode">–</b><button id="copyCode" class="ghost">Kopieren</button></div></div>
+  <div class="actions"><label>Meine Liga<select id="leagueSelect"></select></label><label>Neue Liga<input id="newLeagueName" placeholder="z. B. PuckBoss Sottrum"></label><button id="createLeague" class="primary">Liga erstellen</button><label>Einladungscode<input id="joinCode" placeholder="ABCDEFGH" maxlength="8"></label><button id="joinLeague" class="primary">Beitreten</button></div><p id="leagueMessage" class="error"></p></section>
+  <nav><button class="nav active" data-view="tips">Tippen</button><button class="nav" data-view="table">Rangliste</button><button class="nav" data-view="results">Ergebnisse</button></nav>
+  <section id="tipsView"></section><section id="tableView" class="hidden"></section><section id="resultsView" class="hidden"></section>
+</section>
+</main><div id="toast"></div><script type="module" src="app.js"></script>
+</body></html>
