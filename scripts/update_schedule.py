@@ -8,6 +8,7 @@ from pypdf import PdfReader
 
 PDF_URL = "https://www.penny-del.org/fileadmin/user_upload/downloads/Spielplan_2026-27_260626.pdf"
 OUTPUT = Path("docs/data/games.json")
+SEASON = "2026/27"
 
 TEAM_NAMES = {
     "Red Bull München": "EHC Red Bull München",
@@ -25,12 +26,23 @@ TEAMS = {
     "Schwenninger Willd Wings", "Straubing Tigers"
 }
 
+
 def normalize_team(value):
     value = " ".join(value.split())
     return TEAM_NAMES.get(value, value)
 
+
 def is_team(value):
-    return normalize_team(value) in {normalize_team(x) for x in TEAMS}
+    normalized = normalize_team(value)
+    return normalized in {normalize_team(x) for x in TEAMS}
+
+
+def make_regular_game_id(date, time, home, away):
+    return (
+        f"regular-{date.isoformat()}-{time.replace(':', '')}-"
+        f"{home}-{away}"
+    ).lower().replace(" ", "-")
+
 
 def parse_pdf():
     response = requests.get(PDF_URL, timeout=60)
@@ -54,6 +66,7 @@ def parse_pdf():
             current_round = int(line)
             i += 1
             line = lines[i]
+
         if DATE_RE.match(line):
             current_date = datetime.strptime(line, "%d.%m.%y").date()
             i += 1
@@ -63,10 +76,12 @@ def parse_pdf():
                 i += 1
             if i >= len(lines) or not TIME_RE.match(lines[i]):
                 continue
+
             time = lines[i]
             i += 1
             if i + 1 >= len(lines):
                 break
+
             home = normalize_team(lines[i])
             away = normalize_team(lines[i + 1])
             if is_team(home) and is_team(away):
@@ -74,15 +89,21 @@ def parse_pdf():
                     f"{current_date.isoformat()} {time}", "%Y-%m-%d %H:%M"
                 ).isoformat()
                 games.append({
-                    "id": f"{current_date.isoformat()}-{time.replace(':', '')}-{home}-{away}".lower().replace(" ", "-"),
+                    "id": make_regular_game_id(current_date, time, home, away),
+                    "season": SEASON,
+                    "phase": "regular",
+                    "round": current_round,
+                    "playoffRound": None,
+                    "seriesId": None,
+                    "gameNumber": None,
                     "date": current_date.isoformat(),
                     "dateTime": dt,
                     "time": time,
-                    "round": current_round,
                     "home": home,
                     "away": away,
                     "homeScore": None,
                     "awayScore": None,
+                    "status": "scheduled",
                 })
                 i += 2
                 continue
@@ -97,10 +118,19 @@ def parse_pdf():
 def main():
     games = parse_pdf()
     if len(games) < 300:
-        raise RuntimeError(f"Nur {len(games)} Spiele erkannt. Import wird abgebrochen, damit kein fehlerhafter Spielplan veröffentlicht wird.")
+        raise RuntimeError(
+            f"Nur {len(games)} Spiele erkannt. Import wird abgebrochen, "
+            "damit kein fehlerhafter Spielplan veröffentlicht wird."
+        )
+
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(json.dumps(games, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Imported {len(games)} games from the official PENNY DEL schedule.")
+    OUTPUT.write_text(
+        json.dumps(games, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    print(f"Imported {len(games)} regular-season games for {SEASON}.")
+    print("Playoff games use the same schema with phase='playoffs' and are added separately.")
+
 
 if __name__ == "__main__":
     main()
