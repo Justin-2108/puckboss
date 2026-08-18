@@ -1,18 +1,18 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, addDoc, collection, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const MAIN_LEAGUE_ID = "puckboss-2026-27";
+const MAIN_LEAGUE_NAME = "PuckBoss 2026/27";
 
 let games = [];
 let user = null;
-let leagues = [];
 let league = null;
 let register = false;
-let showCode = false;
 let tipRefreshTimer = null;
 let draftTips = {};
 
@@ -30,13 +30,6 @@ function toast(message) {
   e.textContent = message;
   e.style.display = "block";
   setTimeout(() => e.style.display = "none", 2500);
-}
-
-function makeCode() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let result = "";
-  for (let i = 0; i < 8; i++) result += chars[Math.floor(Math.random() * chars.length)];
-  return result;
 }
 
 function gameDate(g) {
@@ -84,53 +77,26 @@ async function loadGames() {
   }
 }
 
-async function loadMemberships() {
-  leagues = [];
-  const snapshot = await getDocs(query(collection(db, "leagueMembers"), where("uid", "==", user.uid)));
-  for (const member of snapshot.docs) {
-    const data = member.data();
-    const leagueDoc = await getDoc(doc(db, "leagues", data.leagueId));
-    if (leagueDoc.exists()) leagues.push({ id: leagueDoc.id, ...leagueDoc.data() });
+async function ensureMainLeague() {
+  const leagueRef = doc(db, "leagues", MAIN_LEAGUE_ID);
+  const leagueSnapshot = await getDoc(leagueRef);
+  if (!leagueSnapshot.exists()) {
+    await setDoc(leagueRef, {
+      name: MAIN_LEAGUE_NAME,
+      ownerUid: user.uid,
+      createdAt: serverTimestamp()
+    });
   }
-  if (!league && leagues.length) league = leagues[0];
-}
 
-async function createLeague(name) {
-  name = name.trim();
-  if (name.length < 3) throw Error("Der Liganame muss mindestens 3 Zeichen lang sein.");
-  let code = makeCode();
-  while ((await getDoc(doc(db, "leagueCodes", code))).exists()) code = makeCode();
-  const leagueDoc = await addDoc(collection(db, "leagues"), { name, code, ownerUid: user.uid, createdAt: serverTimestamp() });
-  await setDoc(doc(db, "leagueCodes", code), { leagueId: leagueDoc.id });
-  await setDoc(doc(db, "leagueMembers", user.uid + "_" + leagueDoc.id), {
-    uid: user.uid, leagueId: leagueDoc.id,
-    displayName: user.displayName || user.email.split("@")[0], joinedAt: serverTimestamp()
-  });
-  league = { id: leagueDoc.id, name, code, ownerUid: user.uid };
-  showCode = true;
-  draftTips = {};
-  await loadMemberships();
-  await renderLeague();
-  toast("Liga erstellt.");
-}
+  const memberRef = doc(db, "leagueMembers", user.uid + "_" + MAIN_LEAGUE_ID);
+  await setDoc(memberRef, {
+    uid: user.uid,
+    leagueId: MAIN_LEAGUE_ID,
+    displayName: user.displayName || user.email.split("@")[0],
+    joinedAt: serverTimestamp()
+  }, { merge: true });
 
-async function joinLeague(input) {
-  const code = input.trim().toUpperCase();
-  if (code.length !== 8) throw Error("Der Einladungscode muss 8 Zeichen haben.");
-  const codeDoc = await getDoc(doc(db, "leagueCodes", code));
-  if (!codeDoc.exists()) throw Error("Einladungscode nicht gefunden.");
-  const leagueId = codeDoc.data().leagueId;
-  const leagueDoc = await getDoc(doc(db, "leagues", leagueId));
-  if (!leagueDoc.exists()) throw Error("Liga nicht gefunden.");
-  await setDoc(doc(db, "leagueMembers", user.uid + "_" + leagueId), {
-    uid: user.uid, leagueId, displayName: user.displayName || user.email.split("@")[0], joinedAt: serverTimestamp()
-  });
-  league = { id: leagueId, ...leagueDoc.data() };
-  showCode = false;
-  draftTips = {};
-  await loadMemberships();
-  await renderLeague();
-  toast("Liga beigetreten.");
+  league = { id: MAIN_LEAGUE_ID, name: MAIN_LEAGUE_NAME };
 }
 
 async function getTips(uid = user.uid) {
@@ -197,21 +163,25 @@ function teamMarkup(name, logoOnRight) {
   return logoOnRight ? text + image : image + text;
 }
 
-function currentTipFor(game, loadedTips) { return draftTips[game.id] || loadedTips[game.id] || {}; }
+function currentTipFor(game, loadedTips) {
+  return draftTips[game.id] || loadedTips[game.id] || {};
+}
 
 async function renderTips() {
   if (!league) {
-    $("tipsView").innerHTML = '<div class="card">Erstelle zuerst eine Liga oder tritt einer Liga bei.</div>';
-    scheduleTipRefresh();
+    $("tipsView").innerHTML = '<div class="card">Tippspiel wird geladen …</div>';
     return;
   }
   const loadedTips = await getTips();
   draftTips = { ...loadedTips, ...draftTips };
   let html = "";
+
   gamesByDay().forEach((list, day) => {
     html += '<section class="gameGroup"><h2>' + new Date(day + "T12:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "2-digit", year: "numeric" }) + '</h2><div class="gameList">';
     list.forEach(game => {
-      const tip = currentTipFor(game, loadedTips), homeValue = tip.home == null ? "" : tip.home, awayValue = tip.away == null ? "" : tip.away;
+      const tip = currentTipFor(game, loadedTips);
+      const homeValue = tip.home == null ? "" : tip.home;
+      const awayValue = tip.away == null ? "" : tip.away;
       html += '<div class="game"><div class="date"><b>' + esc(gameTime(game)) + '</b><small>Spiel ' + esc(game.round) + '</small></div><div class="teams"><span class="team home-team">' + teamMarkup(game.home, true) + '</span><span class="vs">vs.</span><span class="team away-team">' + teamMarkup(game.away, false) + '</span></div><div class="score">';
       if (locked(game)) {
         html += '<div class="locked">' + (game.homeScore != null ? 'Endstand <b>' + game.homeScore + ':' + game.awayScore + '</b>' : 'Tipp geschlossen') + '</div>';
@@ -222,13 +192,16 @@ async function renderTips() {
     });
     html += '</div></section>';
   });
+
   html += '<div class="save"><button class="primary" id="saveAll" type="button">Tipps speichern</button></div>';
   $("tipsView").innerHTML = html;
 
   document.querySelectorAll("#tipsView .tip-input").forEach(input => {
     input.addEventListener("focus", () => input.select());
     input.addEventListener("input", () => {
-      const clean = input.value.replace(/[^0-9]/g, "").slice(0, 2), id = input.dataset.id, side = input.dataset.side;
+      const clean = input.value.replace(/[^0-9]/g, "").slice(0, 2);
+      const id = input.dataset.id;
+      const side = input.dataset.side;
       if (input.value !== clean) input.value = clean;
       if (!draftTips[id]) draftTips[id] = {};
       draftTips[id][side] = clean === "" ? null : Number(clean);
@@ -239,16 +212,22 @@ async function renderTips() {
     const updated = { ...draftTips };
     let invalid = false;
     document.querySelectorAll("#tipsView .tip-input").forEach(input => {
-      const raw = input.value.trim(), id = input.dataset.id, side = input.dataset.side;
+      const raw = input.value.trim();
+      const id = input.dataset.id;
+      const side = input.dataset.side;
       if (!updated[id]) updated[id] = {};
       updated[id][side] = raw === "" ? null : Number(raw);
       if (raw !== "" && (!Number.isInteger(Number(raw)) || Number(raw) < 0 || Number(raw) > 10)) invalid = true;
     });
     if (invalid) { toast("Bitte nur ganze Tore von 0 bis 10 eingeben."); return; }
     try {
-      await saveTips(updated); draftTips = { ...updated }; toast("Tipps gespeichert."); await updateStats();
+      await saveTips(updated);
+      draftTips = { ...updated };
+      toast("Tipps gespeichert.");
+      await updateStats();
     } catch (error) {
-      console.error(error); toast(error.code === "permission-denied" ? "Ein Tipp ist bereits geschlossen." : "Tipps konnten nicht gespeichert werden.");
+      console.error(error);
+      toast(error.code === "permission-denied" ? "Ein Tipp ist bereits geschlossen." : "Tipps konnten nicht gespeichert werden.");
     }
   };
   scheduleTipRefresh();
@@ -258,9 +237,13 @@ async function ranking() {
   if (!league) return [];
   const snapshot = await getDocs(query(collection(db, "leagueMembers"), where("leagueId", "==", league.id)));
   const result = await Promise.all(snapshot.docs.map(async member => {
-    const data = member.data(), tips = await getTips(data.uid);
+    const data = member.data();
+    const tips = await getTips(data.uid);
     let pointsTotal = 0, count = 0;
-    games.forEach(game => { pointsTotal += points(tips[game.id], game); if (tips[game.id] && tips[game.id].home != null && tips[game.id].away != null) count++; });
+    games.forEach(game => {
+      pointsTotal += points(tips[game.id], game);
+      if (tips[game.id] && tips[game.id].home != null && tips[game.id].away != null) count++;
+    });
     return { uid: data.uid, name: data.displayName || "PuckBoss", points: pointsTotal, count };
   }));
   return result.sort((a, b) => b.points - a.points || b.count - a.count || a.name.localeCompare(b.name));
@@ -268,30 +251,38 @@ async function ranking() {
 
 async function renderTable() {
   const list = await ranking();
-  $("tableView").innerHTML = '<div class="card"><h2>' + esc(league ? league.name : "Rangliste") + '</h2><table class="table"><thead><tr><th>#</th><th>PuckBoss</th><th>Punkte</th><th>Tipps</th></tr></thead><tbody>' + list.map((entry, index) => '<tr class="' + (entry.uid === user.uid ? "me" : "") + '"><td>' + (index + 1) + '</td><td>' + esc(entry.name) + '</td><td><b>' + entry.points + '</b></td><td>' + entry.count + '</td></tr>').join("") + '</tbody></table></div>';
+  $("tableView").innerHTML = '<div class="card"><h2>Rangliste</h2><table class="table"><thead><tr><th>#</th><th>PuckBoss</th><th>Punkte</th><th>Tipps</th></tr></thead><tbody>' + list.map((entry, index) => '<tr class="' + (entry.uid === user.uid ? "me" : "") + '"><td>' + (index + 1) + '</td><td>' + esc(entry.name) + '</td><td><b>' + entry.points + '</b></td><td>' + entry.count + '</td></tr>').join("") + '</tbody></table></div>';
 }
 
 async function renderResults() {
-  const tips = await getTips(), done = games.filter(game => game.homeScore != null);
-  if (!done.length) { $("resultsView").innerHTML = '<div class="card">Noch keine Ergebnisse vorhanden.</div>'; return; }
+  const tips = await getTips();
+  const done = games.filter(game => game.homeScore != null);
+  if (!done.length) {
+    $("resultsView").innerHTML = '<div class="card">Noch keine Ergebnisse vorhanden.</div>';
+    return;
+  }
   $("resultsView").innerHTML = '<div class="card"><h2>Ergebnisse</h2>' + done.slice().reverse().map(game => '<div class="result"><div>' + esc(String(game.date || "").slice(0, 10)) + '<small>' + esc(gameTime(game)) + '</small></div><div class="teams"><span class="team">' + teamMarkup(game.home, true) + '</span><span class="vs">vs.</span><span class="team">' + teamMarkup(game.away, false) + '</span><br><b>' + game.homeScore + ':' + game.awayScore + '</b></div><div>' + (tips[game.id] ? 'Tipp ' + tips[game.id].home + ':' + tips[game.id].away + '<br><b>' + points(tips[game.id], game) + ' Punkte</b>' : 'Kein Tipp') + '</div></div>').join("") + '</div>';
 }
 
 async function updateStats() {
-  if (!league) { $("tipCount").textContent = "0"; $("points").textContent = "0"; $("rank").textContent = "–"; return; }
-  const tips = await getTips(), list = await ranking();
-  let totalPoints = 0; games.forEach(game => totalPoints += points(tips[game.id], game));
-  $("tipCount").textContent = Object.keys(tips).length; $("points").textContent = totalPoints;
-  const position = list.findIndex(entry => entry.uid === user.uid); $("rank").textContent = position < 0 ? "–" : String(position + 1);
+  if (!league) {
+    $("tipCount").textContent = "0";
+    $("points").textContent = "0";
+    $("rank").textContent = "–";
+    return;
+  }
+  const tips = await getTips();
+  const list = await ranking();
+  let totalPoints = 0;
+  games.forEach(game => totalPoints += points(tips[game.id], game));
+  $("tipCount").textContent = Object.keys(tips).length;
+  $("points").textContent = totalPoints;
+  const position = list.findIndex(entry => entry.uid === user.uid);
+  $("rank").textContent = position < 0 ? "–" : String(position + 1);
 }
 
 async function renderLeague() {
-  $("leagueSelect").innerHTML = leagues.map(x => '<option value="' + x.id + '">' + esc(x.name) + '</option>').join("");
-  if (league) $("leagueSelect").value = league.id;
-  $("leagueName").textContent = league ? league.name : "Keine Liga";
-  $("leagueCode").textContent = showCode && league ? league.code : "••••••••";
-  $("leagueBox").classList.toggle("hidden", !league);
-  $("toggleCode").textContent = showCode ? "Verbergen" : "Anzeigen";
+  $("leagueName").textContent = league ? league.name : MAIN_LEAGUE_NAME;
   await renderTips();
   await updateStats();
 }
@@ -299,69 +290,75 @@ async function renderLeague() {
 function view(name) {
   ["tips", "table", "results"].forEach(x => $(x + "View").classList.toggle("hidden", x !== name));
   document.querySelectorAll(".nav").forEach(button => button.classList.toggle("active", button.dataset.view === name));
-  if (name === "tips") renderTips(); if (name === "table") renderTable(); if (name === "results") renderResults();
+  if (name === "tips") renderTips();
+  if (name === "table") renderTable();
+  if (name === "results") renderResults();
 }
 
 function authMode(value) {
-  register = value; $("loginTab").classList.toggle("active", !value); $("registerTab").classList.toggle("active", value); $("nameWrap").classList.toggle("hidden", !value); $("authSubmit").textContent = value ? "Registrieren" : "Anmelden";
+  register = value;
+  $("loginTab").classList.toggle("active", !value);
+  $("registerTab").classList.toggle("active", value);
+  $("nameWrap").classList.toggle("hidden", !value);
+  $("authSubmit").textContent = value ? "Registrieren" : "Anmelden";
 }
 
 $("loginTab").onclick = () => authMode(false);
 $("registerTab").onclick = () => authMode(true);
 
 $("authForm").onsubmit = async event => {
-  event.preventDefault(); $("authMessage").textContent = "";
+  event.preventDefault();
+  $("authMessage").textContent = "";
   try {
-    if (register) { const credential = await createUserWithEmailAndPassword(auth, $("email").value, $("password").value); await updateProfile(credential.user, { displayName: $("displayName").value.trim() || "PuckBoss" }); }
-    else await signInWithEmailAndPassword(auth, $("email").value, $("password").value);
-  } catch (error) { console.error(error); $("authMessage").textContent = error.message.replace("Firebase: ", ""); }
+    if (register) {
+      const credential = await createUserWithEmailAndPassword(auth, $("email").value, $("password").value);
+      await updateProfile(credential.user, { displayName: $("displayName").value.trim() || "PuckBoss" });
+    } else {
+      await signInWithEmailAndPassword(auth, $("email").value, $("password").value);
+    }
+  } catch (error) {
+    console.error(error);
+    $("authMessage").textContent = error.message.replace("Firebase: ", "");
+  }
 };
 
 $("logoutBtn").onclick = async () => {
-  try { await signOut(auth); } catch (error) { console.error(error); toast("Abmelden fehlgeschlagen."); }
-};
-
-$("createLeague").onclick = async () => { try { $("leagueMessage").textContent = ""; await createLeague($("newLeagueName").value); $("newLeagueName").value = ""; } catch (error) { $("leagueMessage").textContent = error.message; } };
-$("joinLeague").onclick = async () => { try { $("leagueMessage").textContent = ""; await joinLeague($("joinCode").value); $("joinCode").value = ""; } catch (error) { $("leagueMessage").textContent = error.message; } };
-
-$("toggleCode").onclick = () => {
-  if (!league) return;
-  showCode = !showCode;
-  $("leagueCode").textContent = showCode ? league.code : "••••••••";
-  $("toggleCode").textContent = showCode ? "Verbergen" : "Anzeigen";
-};
-
-async function copyText(text) {
-  if (navigator.clipboard && window.isSecureContext) {
-    await navigator.clipboard.writeText(text);
-    return true;
-  }
-  const area = document.createElement("textarea");
-  area.value = text; area.setAttribute("readonly", ""); area.style.position = "fixed"; area.style.opacity = "0";
-  document.body.appendChild(area); area.select();
-  let ok = false; try { ok = document.execCommand("copy"); } catch (_) { ok = false; }
-  area.remove(); return ok;
-}
-
-$("copyCode").onclick = async () => {
-  if (!league) return;
   try {
-    const ok = await copyText(league.code);
-    showCode = true;
-    $("leagueCode").textContent = league.code;
-    $("toggleCode").textContent = "Verbergen";
-    toast(ok ? "Einladungscode kopiert." : "Kopieren nicht möglich – Code ist sichtbar.");
-  } catch (error) { console.error(error); toast("Kopieren nicht möglich."); }
+    draftTips = {};
+    league = null;
+    await signOut(auth);
+  } catch (error) {
+    console.error(error);
+    toast("Abmelden fehlgeschlagen.");
+  }
 };
 
-$("leagueSelect").onchange = async event => { league = leagues.find(x => x.id === event.target.value) || null; showCode = false; draftTips = {}; await renderLeague(); };
 document.querySelectorAll(".nav").forEach(button => button.onclick = () => view(button.dataset.view));
 
 onAuthStateChanged(auth, async currentUser => {
-  user = currentUser; showCode = false; await loadGames();
+  user = currentUser;
+  draftTips = {};
+  league = null;
+  await loadGames();
+
   if (!currentUser) {
-    $("authCard").classList.remove("hidden"); $("app").classList.add("hidden"); $("logoutBtn").classList.add("hidden"); $("userLabel").textContent = ""; return;
+    $("authCard").classList.remove("hidden");
+    $("app").classList.add("hidden");
+    $("logoutBtn").classList.add("hidden");
+    $("userLabel").textContent = "";
+    return;
   }
-  $("authCard").classList.add("hidden"); $("app").classList.remove("hidden"); $("logoutBtn").classList.remove("hidden"); $("userLabel").textContent = currentUser.displayName || currentUser.email;
-  try { await loadMemberships(); await renderLeague(); } catch (error) { console.error(error); $("leagueMessage").textContent = "Ligen konnten nicht geladen werden."; }
+
+  $("authCard").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  $("logoutBtn").classList.remove("hidden");
+  $("userLabel").textContent = currentUser.displayName || currentUser.email;
+
+  try {
+    await ensureMainLeague();
+    await renderLeague();
+  } catch (error) {
+    console.error(error);
+    $("tipsView").innerHTML = '<div class="card error">Das Tippspiel konnte nicht geladen werden.</div>';
+  }
 });
