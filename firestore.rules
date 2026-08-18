@@ -30,9 +30,9 @@ service cloud.firestore {
         && request.resource.data.home is int
         && request.resource.data.away is int
         && request.resource.data.home >= 0
-        && request.resource.data.home <= 30
+        && request.resource.data.home <= 10
         && request.resource.data.away >= 0
-        && request.resource.data.away <= 30;
+        && request.resource.data.away <= 10;
     }
 
     match /leagues/{leagueId} {
@@ -62,17 +62,11 @@ service cloud.firestore {
         && resource.data.uid == request.auth.uid;
     }
 
-    // Legacy tip document: readable for backwards compatibility, but no
-    // client may write to it anymore. New tips are stored per game below.
     match /leagueTips/{leagueId}/users/{uid} {
       allow read: if isMember(leagueId);
       allow write: if false;
     }
 
-    // One document per game makes the server-side lock enforceable.
-    // A tip can only be created or changed before the real server time reaches
-    // the corresponding puck drop. This cannot be bypassed by changing the
-    // browser clock or by sending a direct Firestore request.
     match /leagueTips/{leagueId}/users/{uid}/games/{gameId} {
       allow read: if isMember(leagueId);
       allow create, update: if isMember(leagueId)
