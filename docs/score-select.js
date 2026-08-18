@@ -1,77 +1,78 @@
-// Mobile-safe score selector.
-// Replaces the editable text score fields with native <select> controls.
-// Native selects are reliably tappable on iOS/Android and do not depend on
-// the virtual keyboard. A hidden input mirrors the selected value so the
-// existing save logic in app.js can remain unchanged.
-(function () {
-  const MAX_GOALS = 30;
-  let observer = null;
-  let busy = false;
+// Touch-safe score picker for PuckBoss.
+// No MutationObserver and no virtual keyboard: tapping a score opens a
+// small native-looking touch keypad with values 0-10.
+(() => {
+  let activeInput = null;
+  let keypad = null;
 
-  function makeSelect(input) {
-    if (!input || input.dataset.scoreSelect === "true") return;
+  function ensureKeypad() {
+    if (keypad) return keypad;
 
-    const select = document.createElement("select");
-    select.className = "score-select";
-    select.dataset.id = input.dataset.id || "";
-    select.dataset.side = input.dataset.side || "";
-    select.setAttribute("aria-label", select.dataset.side === "home" ? "Heimtore" : "Auswärtstore");
+    keypad = document.createElement("div");
+    keypad.id = "puckbossKeypad";
+    keypad.innerHTML = `
+      <div class="pb-keypad-backdrop"></div>
+      <div class="pb-keypad-panel" role="dialog" aria-label="Tipp auswählen">
+        <div class="pb-keypad-title">Tore auswählen</div>
+        <div class="pb-keypad-grid">
+          ${Array.from({ length: 11 }, (_, value) => `<button type="button" class="pb-key" data-value="${value}">${value}</button>`).join("")}
+        </div>
+        <button type="button" class="pb-key-clear">Tipp löschen</button>
+      </div>`;
 
-    const current = String(input.value == null ? "" : input.value).trim();
-    for (let value = 0; value <= MAX_GOALS; value += 1) {
-      const option = document.createElement("option");
-      option.value = String(value);
-      option.textContent = String(value);
-      if (String(value) === current || (current === "" && value === 0)) {
-        option.selected = true;
+    document.body.appendChild(keypad);
+
+    keypad.addEventListener("pointerdown", event => {
+      const key = event.target.closest(".pb-key");
+      if (!key) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (!activeInput) return;
+      activeInput.value = key.dataset.value;
+      activeInput.dispatchEvent(new Event("input", { bubbles: true }));
+      closeKeypad();
+    }, true);
+
+    keypad.querySelector(".pb-key-clear").addEventListener("pointerdown", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (activeInput) {
+        activeInput.value = "";
+        activeInput.dispatchEvent(new Event("input", { bubbles: true }));
       }
-      select.appendChild(option);
-    }
+      closeKeypad();
+    }, true);
 
-    const mirror = document.createElement("input");
-    mirror.type = "hidden";
-    mirror.dataset.id = select.dataset.id;
-    mirror.dataset.side = select.dataset.side;
-    mirror.value = select.value;
-    mirror.className = "score-mirror";
+    keypad.querySelector(".pb-keypad-backdrop").addEventListener("pointerdown", event => {
+      event.preventDefault();
+      closeKeypad();
+    }, true);
 
-    select.addEventListener("change", () => {
-      mirror.value = select.value;
-    });
-
-    input.replaceWith(select);
-    select.after(mirror);
+    return keypad;
   }
 
-  function convert() {
-    if (busy) return;
-    const container = document.getElementById("tipsView");
-    if (!container) return;
-    const inputs = container.querySelectorAll('input[type="text"][data-id][data-side]');
-    if (!inputs.length) return;
-
-    busy = true;
-    inputs.forEach(makeSelect);
-    busy = false;
+  function openKeypad(input) {
+    activeInput = input;
+    input.readOnly = true;
+    ensureKeypad().classList.add("open");
   }
 
-  function init() {
-    const container = document.getElementById("tipsView");
-    if (!container || observer) return;
-
-    observer = new MutationObserver(() => {
-      // Wait until app.js has finished inserting the whole game list.
-      requestAnimationFrame(convert);
-    });
-
-    observer.observe(container, { childList: true, subtree: true });
-    convert();
+  function closeKeypad() {
+    if (keypad) keypad.classList.remove("open");
+    activeInput = null;
   }
 
-  const wait = setInterval(() => {
-    if (document.getElementById("tipsView")) {
-      clearInterval(wait);
-      init();
-    }
-  }, 100);
+  // Capture the tap before the browser tries to focus the text input.
+  // This prevents the iOS keyboard/focus problem entirely.
+  document.addEventListener("pointerdown", event => {
+    const input = event.target.closest?.("#tipsView .tip-input");
+    if (!input) return;
+    event.preventDefault();
+    event.stopPropagation();
+    openKeypad(input);
+  }, true);
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeKeypad();
+  });
 })();
