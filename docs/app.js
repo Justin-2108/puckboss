@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, addDoc, deleteDoc, collection, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, addDoc, collection, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
 const app = initializeApp(firebaseConfig);
@@ -133,9 +133,6 @@ async function getTips(uid = user.uid) {
     const snap = await getDoc(doc(db, "leagueTips", league.id, "users", uid, "games", game.id));
     if (snap.exists()) result[game.id] = snap.data();
   }));
-
-  // Read old tips only for the current user's legacy data. They become new
-  // secure per-game documents as soon as the user saves again.
   if (uid === user.uid && Object.keys(result).length === 0) {
     const legacy = await getDoc(doc(db, "leagueTips", league.id, "users", uid));
     if (legacy.exists()) return legacy.data().tips || {};
@@ -149,17 +146,20 @@ async function saveTips(tips) {
   for (const game of games) {
     if (locked(game)) continue;
     const tip = tips[game.id];
+    if (!tip) continue;
+
+    const home = Number(tip.home);
+    const away = Number(tip.away);
+    if (!Number.isInteger(home) || !Number.isInteger(away)) continue;
+    if (home < 0 || home > 30 || away < 0 || away > 30) continue;
+
     const ref = doc(db, "leagueTips", league.id, "users", user.uid, "games", game.id);
-    if (tip && Number.isInteger(tip.home) && Number.isInteger(tip.away)) {
-      writes.push(setDoc(ref, {
-        uid: user.uid,
-        home: tip.home,
-        away: tip.away,
-        updatedAt: serverTimestamp()
-      }));
-    } else {
-      writes.push(deleteDoc(ref));
-    }
+    writes.push(setDoc(ref, {
+      uid: user.uid,
+      home,
+      away,
+      updatedAt: serverTimestamp()
+    }));
   }
   await Promise.all(writes);
 }
@@ -184,20 +184,20 @@ function gamesByDay() {
 
 function logo(team) {
   const files = {
-    "Eisbären Berlin": "assets/teams/eisbaeren-berlin.svg",
-    "Straubing Tigers": "assets/teams/straubing-tigers.svg",
-    "Kölner Haie": "assets/teams/koelner-haie.svg",
-    "Grizzlys Wolfsburg": "assets/teams/grizzlys-wolfsburg.svg",
-    "Nürnberg Ice Tigers": "assets/teams/nuernberg-ice-tigers.svg",
-    "Augsburger Panther": "assets/teams/augsburger-panther.svg",
-    "Krefeld Pinguine": "assets/teams/krefeld-pinguine.svg",
-    "Pinguins Bremerhaven": "assets/teams/pinguins-bremerhaven.svg",
-    "Iserlohn Roosters": "assets/teams/iserlohn-roosters.svg",
-    "ERC Ingolstadt": "assets/teams/erc-ingolstadt.svg",
-    "EHC Red Bull München": "assets/teams/ehc-red-bull-muenchen.svg",
-    "Adler Mannheim": "assets/teams/adler-mannheim.svg",
-    "Schwenninger Wild Wings": "assets/teams/schwenninger-wild-wings.svg",
-    "Löwen Frankfurt": "assets/teams/loewen-frankfurt.svg"
+    "Eisbären Berlin": "assets/teams/berlin.svg",
+    "Straubing Tigers": "assets/teams/straubing.svg",
+    "Kölner Haie": "assets/teams/koeln.svg",
+    "Grizzlys Wolfsburg": "assets/teams/wolfsburg.svg",
+    "Nürnberg Ice Tigers": "assets/teams/nuernberg.svg",
+    "Augsburger Panther": "assets/teams/augsburg.svg",
+    "Krefeld Pinguine": "assets/teams/krefeld.png",
+    "Pinguins Bremerhaven": "assets/teams/bremerhaven.svg",
+    "Iserlohn Roosters": "assets/teams/iserlohn.svg",
+    "ERC Ingolstadt": "assets/teams/ingolstadt.png",
+    "EHC Red Bull München": "assets/teams/muenchen.svg",
+    "Adler Mannheim": "assets/teams/mannheim.svg",
+    "Schwenninger Wild Wings": "assets/teams/schwenningen.svg",
+    "Löwen Frankfurt": "assets/teams/frankfurt.svg"
   };
   return files[team] ? '<img class="team-logo" src="' + files[team] + '" alt="" onerror="this.style.display=\'none\'">' : "";
 }
@@ -214,34 +214,56 @@ async function renderTips() {
     scheduleTipRefresh();
     return;
   }
+
   const tips = await getTips();
   let html = "";
   gamesByDay().forEach((list, day) => {
     html += '<section class="gameGroup"><h2>' + new Date(day + "T12:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "2-digit", year: "numeric" }) + '</h2><div class="gameList">';
     list.forEach((game) => {
       const tip = tips[game.id] || {};
+      const homeValue = tip.home == null ? "" : tip.home;
+      const awayValue = tip.away == null ? "" : tip.away;
       html += '<div class="game"><div class="date"><b>' + esc(gameTime(game)) + '</b><small>Spiel ' + esc(game.round) + '</small></div>';
       html += '<div class="teams"><span class="team home-team">' + team(game.home, true) + '</span><span class="vs">vs.</span><span class="team away-team">' + team(game.away, false) + '</span></div><div class="score">';
       if (locked(game)) {
         html += '<div class="locked">' + (game.homeScore != null ? 'Endstand <b>' + game.homeScore + ':' + game.awayScore + '</b>' : 'Tipp geschlossen') + '</div>';
       } else {
-        html += '<input type="number" min="0" max="30" data-id="' + esc(game.id) + '" data-side="home" value="' + (tip.home == null ? "" : tip.home) + '"><b>:</b><input type="number" min="0" max="30" data-id="' + esc(game.id) + '" data-side="away" value="' + (tip.away == null ? "" : tip.away) + '">';
+        html += '<input type="number" min="0" max="30" inputmode="numeric" data-id="' + esc(game.id) + '" data-side="home" value="' + esc(homeValue) + '"><b>:</b><input type="number" min="0" max="30" inputmode="numeric" data-id="' + esc(game.id) + '" data-side="away" value="' + esc(awayValue) + '">';
       }
       html += '</div></div>';
     });
     html += '</div></section>';
   });
-  html += '<div class="save"><button class="primary" id="saveAll">Tipps speichern</button></div>';
+
+  html += '<div class="save"><button class="primary" id="saveAll" type="button">Tipps speichern</button></div>';
   $("tipsView").innerHTML = html;
+
   $("saveAll").onclick = async () => {
     const updated = Object.assign({}, tips);
+    let invalid = false;
+
     document.querySelectorAll("#tipsView input").forEach((input) => {
+      const raw = input.value.trim();
+      if (raw === "") return;
+      const value = Number(raw);
+      if (!Number.isInteger(value) || value < 0 || value > 30) {
+        invalid = true;
+        return;
+      }
       if (!updated[input.dataset.id]) updated[input.dataset.id] = {};
-      updated[input.dataset.id][input.dataset.side] = Number(input.value);
+      updated[input.dataset.id][input.dataset.side] = value;
     });
+
+    if (invalid) {
+      toast("Bitte nur ganze Tore von 0 bis 30 eingeben.");
+      return;
+    }
+
     try {
       await saveTips(updated);
       toast("Tipps gespeichert.");
+      // Wichtig: Die Tippansicht wird nach dem Speichern NICHT neu gerendert.
+      // Dadurch bleiben die gerade eingegebenen Werte auch auf dem Handy sichtbar.
       await updateStats();
     } catch (error) {
       console.error(error);
@@ -249,6 +271,7 @@ async function renderTips() {
       await renderTips();
     }
   };
+
   scheduleTipRefresh();
 }
 
@@ -346,13 +369,56 @@ $("authForm").onsubmit = async (event) => {
     $("authMessage").textContent = error.message.replace("Firebase: ", "");
   }
 };
-$("logoutBtn").onclick = async () => { showCode = false; league = null; leagues = []; if (tipRefreshTimer) clearTimeout(tipRefreshTimer); tipRefreshTimer = null; await signOut(auth); };
-$("createLeague").onclick = async () => { try { await createLeague($("newLeagueName").value); $("newLeagueName").value = ""; } catch (error) { $("leagueMessage").textContent = error.message; } };
-$("joinLeague").onclick = async () => { try { await joinLeague($("joinCode").value); $("joinCode").value = ""; } catch (error) { $("leagueMessage").textContent = error.message; } };
-$("toggleCode").onclick = async () => { showCode = !showCode; await renderLeague(); };
-$("copyCode").onclick = async () => { if (!league) return; await navigator.clipboard.writeText(league.code); showCode = true; await renderLeague(); toast("Einladungscode kopiert."); };
-$("leagueSelect").onchange = async (event) => { league = leagues.find((item) => item.id === event.target.value) || null; showCode = false; await renderLeague(); };
-document.querySelectorAll(".nav").forEach((button) => { button.onclick = () => view(button.dataset.view); });
+
+$("logoutBtn").onclick = async () => {
+  showCode = false;
+  league = null;
+  leagues = [];
+  if (tipRefreshTimer) clearTimeout(tipRefreshTimer);
+  tipRefreshTimer = null;
+  await signOut(auth);
+};
+
+$("createLeague").onclick = async () => {
+  try {
+    await createLeague($("newLeagueName").value);
+    $("newLeagueName").value = "";
+  } catch (error) {
+    $("leagueMessage").textContent = error.message;
+  }
+};
+
+$("joinLeague").onclick = async () => {
+  try {
+    await joinLeague($("joinCode").value);
+    $("joinCode").value = "";
+  } catch (error) {
+    $("leagueMessage").textContent = error.message;
+  }
+};
+
+$("toggleCode").onclick = async () => {
+  showCode = !showCode;
+  await renderLeague();
+};
+
+$("copyCode").onclick = async () => {
+  if (!league) return;
+  await navigator.clipboard.writeText(league.code);
+  showCode = true;
+  await renderLeague();
+  toast("Einladungscode kopiert.");
+};
+
+$("leagueSelect").onchange = async (event) => {
+  league = leagues.find((item) => item.id === event.target.value) || null;
+  showCode = false;
+  await renderLeague();
+};
+
+document.querySelectorAll(".nav").forEach((button) => {
+  button.onclick = () => view(button.dataset.view);
+});
 
 onAuthStateChanged(auth, async (loggedInUser) => {
   user = loggedInUser;
