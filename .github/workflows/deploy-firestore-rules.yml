@@ -15,23 +15,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Install Firebase Admin SDK
-        run: npm install firebase-admin
-      - name: Deploy Firestore rules
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy Firestore rules with Firebase CLI
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: |
-          node <<'NODE'
-          const fs = require('fs');
-          const admin = require('firebase-admin');
-          const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-          admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-          const source = fs.readFileSync('firestore.rules', 'utf8');
-          admin.securityRules().releaseFirestoreRulesetFromSource(source)
-            .then(() => console.log('Firestore rules deployed successfully.'))
-            .catch(error => { console.error(error); process.exit(1); });
-          NODE
+          set -euo pipefail
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-service-account.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/firebase-service-account.json"
+          PROJECT_ID=$(node -e "console.log(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT).project_id)")
+          echo "Deploying Firestore rules to project: $PROJECT_ID"
+          npx --yes firebase-tools@latest deploy --only firestore:rules --project "$PROJECT_ID" --non-interactive
