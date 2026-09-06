@@ -5,16 +5,13 @@ on:
   push:
     paths:
       - "docs/data/games.json"
-  workflow_run:
-    workflows: ["Update official PENNY DEL schedule", "Update PENNY DEL results"]
-    types: [completed]
 
 permissions:
   contents: read
 
 jobs:
   sync:
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
