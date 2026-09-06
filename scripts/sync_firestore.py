@@ -1,11 +1,26 @@
 import json
 import os
+from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
+
 from google.cloud import firestore
 from google.oauth2 import service_account
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "docs" / "data" / "games.json"
+
+
+def kickoff_timestamp(date_time):
+    if not date_time:
+        return None
+    try:
+        value = datetime.fromisoformat(str(date_time).replace("Z", "+00:00"))
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=ZoneInfo("Europe/Berlin"))
+        return value.astimezone(timezone.utc)
+    except (TypeError, ValueError):
+        return None
 
 
 def main():
@@ -28,6 +43,11 @@ def main():
         game.setdefault("playoffRound", None)
         game.setdefault("seriesId", None)
         game.setdefault("gameNumber", None)
+
+        kickoff = kickoff_timestamp(game.get("dateTime"))
+        if kickoff is not None:
+            game["kickoffAt"] = kickoff
+
         ref = db.collection("games").document(game["id"])
         batch.set(ref, game, merge=True)
         count += 1
