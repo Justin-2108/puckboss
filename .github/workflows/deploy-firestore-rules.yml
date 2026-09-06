@@ -6,6 +6,7 @@ on:
     paths:
       - "firestore.rules"
       - "firebase.json"
+      - ".github/firestore-rules-deploy-trigger"
 
 permissions:
   contents: read
