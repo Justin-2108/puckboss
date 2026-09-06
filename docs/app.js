@@ -8,7 +8,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const MAIN_LEAGUE_ID = "puckboss-2026-27";
 const MAIN_LEAGUE_NAME = "PuckBoss 2026/27";
-let games = [], user = null, league = null, register = false, tipRefreshTimer = null, draftTips = {};
+let games = [], user = null, league = null, register = false, tipRefreshTimer = null, draftTips = {}, tipsCache = new Map();
 const $ = id => document.getElementById(id);
 function esc(v){return String(v==null?"":v).replace(/[&<>\"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));}
 function toast(message){const e=$("toast");if(!e)return;e.textContent=message;e.style.display="block";setTimeout(()=>e.style.display="none",2500);}
@@ -18,8 +18,33 @@ function locked(g){return gameDate(g).getTime()<=Date.now();}
 function scheduleTipRefresh(){if(tipRefreshTimer)clearTimeout(tipRefreshTimer);tipRefreshTimer=null;if(!league)return;const upcoming=games.map(gameDate).filter(d=>!Number.isNaN(d.getTime())&&d.getTime()>Date.now()).sort((a,b)=>a-b)[0];if(!upcoming)return;tipRefreshTimer=setTimeout(async()=>{tipRefreshTimer=null;if(league&&document.activeElement?.matches("#tipsView input")){scheduleTipRefresh();return;}if(league)await renderTips();},Math.max(250,upcoming.getTime()-Date.now()+250));}
 async function loadGames(){try{const response=await fetch("data/games.json?v="+Date.now(),{cache:"no-store"});games=await response.json();}catch(error){games=[];console.error(error);toast("Spielplan konnte nicht geladen werden.");}}
 async function ensureMainLeague(){const leagueRef=doc(db,"leagues",MAIN_LEAGUE_ID);const leagueSnapshot=await getDoc(leagueRef);if(!leagueSnapshot.exists())await setDoc(leagueRef,{name:MAIN_LEAGUE_NAME,ownerUid:user.uid,createdAt:serverTimestamp()});const memberRef=doc(db,"leagueMembers",user.uid+"_"+MAIN_LEAGUE_ID);await setDoc(memberRef,{uid:user.uid,leagueId:MAIN_LEAGUE_ID,displayName:user.displayName||user.email.split("@")[0],joinedAt:serverTimestamp()},{merge:true});league={id:MAIN_LEAGUE_ID,name:MAIN_LEAGUE_NAME};}
-async function getTips(uid=user.uid){if(!league)return{};const result={};await Promise.all(games.map(async game=>{const snapshot=await getDoc(doc(db,"leagueTips",league.id,"users",uid,"games",game.id));if(snapshot.exists())result[game.id]=snapshot.data();}));if(uid===user.uid&&!Object.keys(result).length){const old=await getDoc(doc(db,"leagueTips",league.id,"users",uid));if(old.exists())return old.data().tips||{};}return result;}
-async function saveTips(tips){if(!league||!user)return;const writes=[];for(const game of games){if(locked(game))continue;const tip=tips[game.id];if(!tip||tip.home==null||tip.away==null)continue;const home=Number(tip.home),away=Number(tip.away);if(!Number.isInteger(home)||!Number.isInteger(away)||home<0||home>10||away<0||away>10)continue;writes.push(setDoc(doc(db,"leagueTips",league.id,"users",user.uid,"games",game.id),{uid:user.uid,home,away,updatedAt:serverTimestamp()}));}await Promise.all(writes);}
+async function getTips(uid=user.uid){
+  if(!league)return{};
+  if(tipsCache.has(uid))return tipsCache.get(uid);
+  const result={};
+  const snapshot=await getDocs(collection(db,"leagueTips",league.id,"users",uid,"games"));
+  snapshot.docs.forEach(docSnap=>{result[docSnap.id]=docSnap.data();});
+  if(uid===user.uid&&!Object.keys(result).length){
+    const old=await getDoc(doc(db,"leagueTips",league.id,"users",uid));
+    if(old.exists())Object.assign(result,old.data().tips||{});
+  }
+  tipsCache.set(uid,result);
+  return result;
+}
+async function saveTips(tips){
+  if(!league||!user)return;
+  const writes=[];
+  for(const game of currentRoundGames()){
+    if(locked(game))continue;
+    const tip=tips[game.id];
+    if(!tip||tip.home==null||tip.away==null)continue;
+    const home=Number(tip.home),away=Number(tip.away);
+    if(!Number.isInteger(home)||!Number.isInteger(away)||home<0||home>10||away<0||away>10)continue;
+    writes.push(setDoc(doc(db,"leagueTips",league.id,"users",user.uid,"games",game.id),{uid:user.uid,home,away,updatedAt:serverTimestamp()}));
+  }
+  await Promise.all(writes);
+  tipsCache.set(user.uid,{...tips});
+}
 function points(tip,game){if(!tip||tip.home==null||tip.away==null||game.homeScore==null)return 0;if(tip.home===game.homeScore&&tip.away===game.awayScore)return 3;if(tip.home-tip.away===game.homeScore-game.awayScore)return 2;return Math.sign(tip.home-tip.away)===Math.sign(game.homeScore-game.awayScore)?1:0;}
 function gamesByDay(){const map=new Map();games.forEach(game=>{const day=String(game.date||game.dateTime).slice(0,10);if(!map.has(day))map.set(day,[]);map.get(day).push(game);});map.forEach(list=>list.sort((a,b)=>gameDate(a)-gameDate(b)));return map;}
 function currentRoundGames(){
@@ -63,6 +88,6 @@ function view(name){["tips","table","results"].forEach(x=>$(x+"View").classList.
 function authMode(value){register=value;$("loginTab").classList.toggle("active",!value);$("registerTab").classList.toggle("active",value);$("nameWrap").classList.toggle("hidden",!value);$("authSubmit").textContent=value?"Registrieren":"Anmelden";}
 $("loginTab").onclick=()=>authMode(false);$("registerTab").onclick=()=>authMode(true);
 $("authForm").onsubmit=async event=>{event.preventDefault();$("authMessage").textContent="";try{if(register){const credential=await createUserWithEmailAndPassword(auth,$("email").value,$("password").value);await updateProfile(credential.user,{displayName:$("displayName").value.trim()||"PuckBoss"});}else await signInWithEmailAndPassword(auth,$("email").value,$("password").value);}catch(error){console.error(error);$("authMessage").textContent=error.message.replace("Firebase: ","");}};
-$("logoutBtn").onclick=async()=>{try{draftTips={};league=null;await signOut(auth);}catch(error){console.error(error);toast("Abmelden fehlgeschlagen.");}};
+$("logoutBtn").onclick=async()=>{try{draftTips={};tipsCache.clear();league=null;await signOut(auth);}catch(error){console.error(error);toast("Abmelden fehlgeschlagen.");}};
 document.querySelectorAll(".nav").forEach(button=>button.onclick=()=>view(button.dataset.view));
-onAuthStateChanged(auth,async currentUser=>{user=currentUser;draftTips={};league=null;await loadGames();if(!currentUser){$("authCard").classList.remove("hidden");$("app").classList.add("hidden");$("logoutBtn").classList.add("hidden");$("userLabel").textContent="";return;}$("authCard").classList.add("hidden");$("app").classList.remove("hidden");$("logoutBtn").classList.remove("hidden");$("userLabel").textContent=currentUser.displayName||currentUser.email;try{await ensureMainLeague();await renderLeague();}catch(error){console.error(error);$("tipsView").innerHTML='<div class="card error">Das Tippspiel konnte nicht geladen werden.</div>';}});
+onAuthStateChanged(auth,async currentUser=>{user=currentUser;draftTips={};tipsCache.clear();league=null;await loadGames();if(!currentUser){$("authCard").classList.remove("hidden");$("app").classList.add("hidden");$("logoutBtn").classList.add("hidden");$("userLabel").textContent="";return;}$("authCard").classList.add("hidden");$("app").classList.remove("hidden");$("logoutBtn").classList.remove("hidden");$("userLabel").textContent=currentUser.displayName||currentUser.email;try{await ensureMainLeague();await renderLeague();}catch(error){console.error(error);$("tipsView").innerHTML='<div class="card error">Das Tippspiel konnte nicht geladen werden.</div>';}});
