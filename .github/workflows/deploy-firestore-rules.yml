@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - "firestore.rules"
+      - "firebase.json"
 
 permissions:
   contents: read
@@ -25,4 +26,4 @@ jobs:
       - name: Deploy Firestore rules
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-service-account.json
-        run: firebase deploy --only firestore:rules --project puckboss-7551e --non-interactive
+        run: firebase deploy --only firestore:rules --project puckboss-7551 --non-interactive
