@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - "docs/data/games.json"
+      - "scripts/sync_firestore.py"
 
 permissions:
   contents: read
