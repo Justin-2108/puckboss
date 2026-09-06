@@ -12,17 +12,10 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/leagueMembers/$(request.auth.uid + '_' + leagueId));
     }
 
-    // Server-side kickoff times for the games currently in games.json.
-    // The browser can never change these values.
+    // The server-side kickoff time comes from the synchronized games document.
+    // This keeps the lock tied to the official schedule instead of a hardcoded list.
     function kickoff(gameId) {
-      return gameId == '2026-09-17_EBB_STR' ? timestamp.value(1789666200000) :
-        gameId == '2026-09-18_KHA_GW' ? timestamp.value(1789752600000) :
-        gameId == '2026-09-18_NIT_AEV' ? timestamp.value(1789752600000) :
-        gameId == '2026-09-18_KEV_PEB' ? timestamp.value(1789752600000) :
-        gameId == '2026-09-18_ISE_ING' ? timestamp.value(1789752600000) :
-        gameId == '2026-09-18_MUC_MAN' ? timestamp.value(1789752600000) :
-        gameId == '2026-09-18_SWW_LF' ? timestamp.value(1789752600000) :
-        timestamp.value(0);
+      return get(/databases/$(database)/documents/games/$(gameId)).data.kickoffAt;
     }
 
     function validTip() {
@@ -76,6 +69,11 @@ service cloud.firestore {
       allow delete: if isMember(leagueId)
         && uid == request.auth.uid
         && request.time < kickoff(gameId);
+    }
+
+    match /games/{gameId} {
+      allow read: if signedIn();
+      allow write: if false;
     }
 
     match /{document=**} {
