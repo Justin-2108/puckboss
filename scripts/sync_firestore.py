@@ -44,6 +44,8 @@ def main():
         game.setdefault("seriesId", None)
         game.setdefault("gameNumber", None)
 
+        # Store the kickoff as a Firestore Timestamp so security rules can
+        # enforce the tip deadline using the server's request.time.
         kickoff = kickoff_timestamp(game.get("dateTime"))
         if kickoff is not None:
             game["kickoffAt"] = kickoff
