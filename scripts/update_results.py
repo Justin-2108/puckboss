@@ -31,7 +31,7 @@ TEAM_PATTERN = "|".join(re.escape(name) for name in sorted(TEAM_NAMES, key=len, 
 TEAM_RE = re.compile(rf"(?P<team>{TEAM_PATTERN})")
 DATE_RE = re.compile(r"(?P<date>\d{2}\.\d{2}\.\d{4})")
 SCORE_RE = re.compile(
-    r"(?P<home>\d{1,2})\s*[-:]\s*(?P<away>\d{1,2})"
+    r"(?P<home>\d{1,2})\s*-\s*(?P<away>\d{1,2})"
     r"(?:\s*\((?P<details>[^)]*)\))?"
 )
 
