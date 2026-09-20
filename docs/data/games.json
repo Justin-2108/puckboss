@@ -185,8 +185,8 @@
     "time": "16:30",
     "home": "Straubing Tigers",
     "away": "Krefeld Pinguine",
-    "homeScore": 1,
-    "awayScore": 2,
+    "homeScore": 3,
+    "awayScore": 6,
     "status": "finished",
     "overtime": false
   },
@@ -203,8 +203,8 @@
     "time": "16:30",
     "home": "Grizzlys Wolfsburg",
     "away": "EHC Red Bull München",
-    "homeScore": 2,
-    "awayScore": 2,
+    "homeScore": 4,
+    "awayScore": 3,
     "status": "finished",
     "overtime": false
   },
@@ -221,8 +221,8 @@
     "time": "16:30",
     "home": "Augsburger Panther",
     "away": "Schwenninger Wild Wings",
-    "homeScore": 5,
-    "awayScore": 0,
+    "homeScore": 7,
+    "awayScore": 3,
     "status": "finished",
     "overtime": false
   },
@@ -239,9 +239,10 @@
     "time": "19:00",
     "home": "Kölner Haie",
     "away": "Löwen Frankfurt",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 3,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-09-22-1930-n-rnberg-ice-tigers-adler-mannheim",
