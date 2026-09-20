@@ -131,9 +131,10 @@
     "time": "14:00",
     "home": "Adler Mannheim",
     "away": "Eisbären Berlin",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 4,
+    "awayScore": 3,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-09-20-1400-pinguins-bremerhaven-iserlohn-roosters",
@@ -148,9 +149,10 @@
     "time": "14:00",
     "home": "Pinguins Bremerhaven",
     "away": "Iserlohn Roosters",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-09-20-1400-erc-ingolstadt-n-rnberg-ice-tigers",
@@ -165,9 +167,10 @@
     "time": "14:00",
     "home": "ERC Ingolstadt",
     "away": "Nürnberg Ice Tigers",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 6,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-09-20-1630-straubing-tigers-krefeld-pinguine",
@@ -182,9 +185,10 @@
     "time": "16:30",
     "home": "Straubing Tigers",
     "away": "Krefeld Pinguine",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-09-20-1630-grizzlys-wolfsburg-ehc-red-bull-m-nchen",
@@ -199,9 +203,10 @@
     "time": "16:30",
     "home": "Grizzlys Wolfsburg",
     "away": "EHC Red Bull München",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-09-20-1630-augsburger-panther-schwenninger-wild-wings",
@@ -216,9 +221,10 @@
     "time": "16:30",
     "home": "Augsburger Panther",
     "away": "Schwenninger Wild Wings",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 5,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-09-20-1900-k-lner-haie-l-wen-frankfurt",
