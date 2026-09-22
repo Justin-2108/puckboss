@@ -48,15 +48,10 @@ async function saveTips(tips){
 function points(tip,game){if(!tip||tip.home==null||tip.away==null||game.homeScore==null)return 0;if(tip.home===game.homeScore&&tip.away===game.awayScore)return 3;if(tip.home-tip.away===game.homeScore-game.awayScore)return 2;return Math.sign(tip.home-tip.away)===Math.sign(game.homeScore-game.awayScore)?1:0;}
 function gamesByDay(){const map=new Map();games.forEach(game=>{const day=String(game.date||game.dateTime).slice(0,10);if(!map.has(day))map.set(day,[]);map.get(day).push(game);});map.forEach(list=>list.sort((a,b)=>gameDate(a)-gameDate(b)));return map;}
 function currentRoundGames(){
-  const future=games.filter(game=>{const d=gameDate(game);return !Number.isNaN(d.getTime())&&d.getTime()>Date.now();});
+  const future=games.filter(game=>{const d=gameDate(game);return !Number.isNaN(d.getTime())&&d.getTime()>Date.now();}).sort((a,b)=>gameDate(a)-gameDate(b));
   if(!future.length)return [];
-  const rounds=future.map(game=>Number(game.round)).filter(Number.isFinite);
-  if(rounds.length){
-    const nextRound=Math.min(...rounds);
-    return games.filter(game=>Number(game.round)===nextRound).sort((a,b)=>gameDate(a)-gameDate(b));
-  }
-  const firstDay=String(future.slice().sort((a,b)=>gameDate(a)-gameDate(b))[0].date||future[0].dateTime).slice(0,10);
-  return games.filter(game=>String(game.date||game.dateTime).slice(0,10)===firstDay).sort((a,b)=>gameDate(a)-gameDate(b));
+  const nextDate=String(future[0].dateTime||future[0].date||"").slice(0,10);
+  return games.filter(game=>String(game.dateTime||game.date||"").slice(0,10)===nextDate).sort((a,b)=>gameDate(a)-gameDate(b));
 }
 function logo(teamName){const files={"Eisbären Berlin":"assets/teams/berlin.svg","Straubing Tigers":"assets/teams/straubing.svg","Kölner Haie":"assets/teams/koeln.svg","Grizzlys Wolfsburg":"assets/teams/wolfsburg.svg","Nürnberg Ice Tigers":"assets/teams/nuernberg.svg","Augsburger Panther":"assets/teams/augsburg.svg","Krefeld Pinguine":"assets/teams/krefeld.png","Pinguins Bremerhaven":"assets/teams/bremerhaven.svg","Iserlohn Roosters":"assets/teams/iserlohn.svg","ERC Ingolstadt":"assets/teams/ingolstadt.png","EHC Red Bull München":"assets/teams/muenchen.svg","Adler Mannheim":"assets/teams/mannheim.svg","Schwenninger Wild Wings":"assets/teams/schwenningen.svg","Löwen Frankfurt":"assets/teams/frankfurt.svg"};return files[teamName]?'<img class="team-logo" src="'+files[teamName]+'" alt="" width="42" height="42">':"";}
 function teamMarkup(name,logoOnRight){const image=logo(name),text='<span class="team-name">'+esc(name)+'</span>';return logoOnRight?text+image:image+text;}
