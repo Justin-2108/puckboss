@@ -267,9 +267,10 @@
     "time": "19:30",
     "home": "Iserlohn Roosters",
     "away": "Augsburger Panther",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-09-25-1930-k-lner-haie-eisb-ren-berlin",
