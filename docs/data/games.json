@@ -284,8 +284,8 @@
     "time": "19:30",
     "home": "Kölner Haie",
     "away": "Eisbären Berlin",
-    "homeScore": 3,
-    "awayScore": 5,
+    "homeScore": 5,
+    "awayScore": 6,
     "status": "finished",
     "overtime": false
   },
@@ -356,9 +356,10 @@
     "time": "19:30",
     "home": "Straubing Tigers",
     "away": "ERC Ingolstadt",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 4,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-09-25-1930-grizzlys-wolfsburg-schwenninger-wild-wings",
@@ -374,7 +375,7 @@
     "home": "Grizzlys Wolfsburg",
     "away": "Schwenninger Wild Wings",
     "homeScore": 3,
-    "awayScore": 3,
+    "awayScore": 4,
     "status": "finished",
     "overtime": false
   },
