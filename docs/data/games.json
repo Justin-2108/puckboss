@@ -440,8 +440,8 @@
     "time": "16:30",
     "home": "Nürnberg Ice Tigers",
     "away": "Straubing Tigers",
-    "homeScore": 0,
-    "awayScore": 1,
+    "homeScore": 2,
+    "awayScore": 3,
     "status": "finished",
     "overtime": false
   },
@@ -458,8 +458,8 @@
     "time": "16:30",
     "home": "Krefeld Pinguine",
     "away": "Schwenninger Wild Wings",
-    "homeScore": 2,
-    "awayScore": 1,
+    "homeScore": 5,
+    "awayScore": 2,
     "status": "finished",
     "overtime": false
   },
@@ -476,8 +476,8 @@
     "time": "16:30",
     "home": "Augsburger Panther",
     "away": "Kölner Haie",
-    "homeScore": 1,
-    "awayScore": 2,
+    "homeScore": 4,
+    "awayScore": 6,
     "status": "finished",
     "overtime": false
   },
@@ -494,9 +494,10 @@
     "time": "19:00",
     "home": "ERC Ingolstadt",
     "away": "Adler Mannheim",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-01-1930-adler-mannheim-iserlohn-roosters",
