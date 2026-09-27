@@ -386,9 +386,10 @@
     "time": "14:00",
     "home": "Eisbären Berlin",
     "away": "Iserlohn Roosters",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 4,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-09-27-1400-ehc-red-bull-m-nchen-l-wen-frankfurt",
@@ -403,9 +404,10 @@
     "time": "14:00",
     "home": "EHC Red Bull München",
     "away": "Löwen Frankfurt",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 4,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-09-27-1400-grizzlys-wolfsburg-pinguins-bremerhaven",
@@ -420,9 +422,10 @@
     "time": "14:00",
     "home": "Grizzlys Wolfsburg",
     "away": "Pinguins Bremerhaven",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 3,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-09-27-1630-n-rnberg-ice-tigers-straubing-tigers",
@@ -437,9 +440,10 @@
     "time": "16:30",
     "home": "Nürnberg Ice Tigers",
     "away": "Straubing Tigers",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 0,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-09-27-1630-krefeld-pinguine-schwenninger-wild-wings",
@@ -454,9 +458,10 @@
     "time": "16:30",
     "home": "Krefeld Pinguine",
     "away": "Schwenninger Wild Wings",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-09-27-1630-augsburger-panther-k-lner-haie",
@@ -471,9 +476,10 @@
     "time": "16:30",
     "home": "Augsburger Panther",
     "away": "Kölner Haie",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-09-27-1900-erc-ingolstadt-adler-mannheim",
