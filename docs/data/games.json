@@ -505,9 +505,10 @@
     "time": "19:30",
     "home": "Adler Mannheim",
     "away": "Iserlohn Roosters",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 6,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-02-1930-k-lner-haie-ehc-red-bull-m-nchen",
