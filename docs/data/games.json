@@ -522,9 +522,10 @@
     "time": "19:30",
     "home": "Kölner Haie",
     "away": "EHC Red Bull München",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 3,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-02-1930-n-rnberg-ice-tigers-schwenninger-wild-wings",
@@ -539,9 +540,10 @@
     "time": "19:30",
     "home": "Nürnberg Ice Tigers",
     "away": "Schwenninger Wild Wings",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-02-1930-krefeld-pinguine-erc-ingolstadt",
@@ -556,9 +558,10 @@
     "time": "19:30",
     "home": "Krefeld Pinguine",
     "away": "ERC Ingolstadt",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 0,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-02-1930-l-wen-frankfurt-eisb-ren-berlin",
@@ -573,9 +576,10 @@
     "time": "19:30",
     "home": "Löwen Frankfurt",
     "away": "Eisbären Berlin",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 0,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-02-1930-augsburger-panther-grizzlys-wolfsburg",
@@ -590,9 +594,10 @@
     "time": "19:30",
     "home": "Augsburger Panther",
     "away": "Grizzlys Wolfsburg",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 4,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-02-1930-straubing-tigers-pinguins-bremerhaven",
@@ -607,9 +612,10 @@
     "time": "19:30",
     "home": "Straubing Tigers",
     "away": "Pinguins Bremerhaven",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-04-1400-eisb-ren-berlin-n-rnberg-ice-tigers",
