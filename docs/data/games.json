@@ -624,9 +624,10 @@
     "time": "14:00",
     "home": "Eisbären Berlin",
     "away": "Nürnberg Ice Tigers",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-04-1400-pinguins-bremerhaven-l-wen-frankfurt",
@@ -641,9 +642,10 @@
     "time": "14:00",
     "home": "Pinguins Bremerhaven",
     "away": "Löwen Frankfurt",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-04-1400-schwenninger-wild-wings-straubing-tigers",
@@ -658,9 +660,10 @@
     "time": "14:00",
     "home": "Schwenninger Wild Wings",
     "away": "Straubing Tigers",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 0,
+    "awayScore": 3,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-04-1630-erc-ingolstadt-k-lner-haie",
