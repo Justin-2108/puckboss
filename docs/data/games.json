@@ -743,9 +743,10 @@
     "time": "19:30",
     "home": "Löwen Frankfurt",
     "away": "Krefeld Pinguine",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 5,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-09-1930-k-lner-haie-schwenninger-wild-wings",
