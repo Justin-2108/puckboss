@@ -796,8 +796,8 @@
     "time": "19:30",
     "home": "Nürnberg Ice Tigers",
     "away": "Adler Mannheim",
-    "homeScore": 1,
-    "awayScore": 3,
+    "homeScore": 2,
+    "awayScore": 5,
     "status": "finished",
     "overtime": false
   },
@@ -814,7 +814,7 @@
     "time": "19:30",
     "home": "Augsburger Panther",
     "away": "Pinguins Bremerhaven",
-    "homeScore": 1,
+    "homeScore": 3,
     "awayScore": 0,
     "status": "finished",
     "overtime": false
@@ -833,7 +833,7 @@
     "home": "EHC Red Bull München",
     "away": "ERC Ingolstadt",
     "homeScore": 1,
-    "awayScore": 4,
+    "awayScore": 5,
     "status": "finished",
     "overtime": false
   },
@@ -851,7 +851,7 @@
     "home": "Straubing Tigers",
     "away": "Iserlohn Roosters",
     "homeScore": 11,
-    "awayScore": 2,
+    "awayScore": 4,
     "status": "finished",
     "overtime": false
   },
