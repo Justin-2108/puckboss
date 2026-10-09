@@ -760,9 +760,10 @@
     "time": "19:30",
     "home": "Kölner Haie",
     "away": "Schwenninger Wild Wings",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 4,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-09-1930-eisb-ren-berlin-grizzlys-wolfsburg",
@@ -777,9 +778,10 @@
     "time": "19:30",
     "home": "Eisbären Berlin",
     "away": "Grizzlys Wolfsburg",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 5,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-09-1930-n-rnberg-ice-tigers-adler-mannheim",
@@ -794,9 +796,10 @@
     "time": "19:30",
     "home": "Nürnberg Ice Tigers",
     "away": "Adler Mannheim",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 3,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-09-1930-augsburger-panther-pinguins-bremerhaven",
@@ -811,9 +814,10 @@
     "time": "19:30",
     "home": "Augsburger Panther",
     "away": "Pinguins Bremerhaven",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-09-1930-ehc-red-bull-m-nchen-erc-ingolstadt",
@@ -828,9 +832,10 @@
     "time": "19:30",
     "home": "EHC Red Bull München",
     "away": "ERC Ingolstadt",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 4,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-09-1930-straubing-tigers-iserlohn-roosters",
@@ -845,9 +850,10 @@
     "time": "19:30",
     "home": "Straubing Tigers",
     "away": "Iserlohn Roosters",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 11,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-11-1400-krefeld-pinguine-augsburger-panther",
