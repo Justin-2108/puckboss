@@ -899,7 +899,7 @@
     "home": "Pinguins Bremerhaven",
     "away": "Eisbären Berlin",
     "homeScore": 0,
-    "awayScore": 0,
+    "awayScore": 3,
     "status": "finished",
     "overtime": false
   },
@@ -916,8 +916,8 @@
     "time": "16:30",
     "home": "Kölner Haie",
     "away": "Nürnberg Ice Tigers",
-    "homeScore": 2,
-    "awayScore": 0,
+    "homeScore": 4,
+    "awayScore": 2,
     "status": "finished",
     "overtime": false
   },
@@ -934,8 +934,8 @@
     "time": "16:30",
     "home": "Iserlohn Roosters",
     "away": "Grizzlys Wolfsburg",
-    "homeScore": 0,
-    "awayScore": 0,
+    "homeScore": 3,
+    "awayScore": 2,
     "status": "finished",
     "overtime": false
   },
@@ -952,8 +952,8 @@
     "time": "16:30",
     "home": "Schwenninger Wild Wings",
     "away": "EHC Red Bull München",
-    "homeScore": 0,
-    "awayScore": 0,
+    "homeScore": 3,
+    "awayScore": 4,
     "status": "finished",
     "overtime": false
   },
@@ -970,9 +970,10 @@
     "time": "19:00",
     "home": "Adler Mannheim",
     "away": "Straubing Tigers",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-15-1930-grizzlys-wolfsburg-krefeld-pinguine",
