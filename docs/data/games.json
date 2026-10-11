@@ -862,9 +862,10 @@
     "time": "14:00",
     "home": "Krefeld Pinguine",
     "away": "Augsburger Panther",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-11-1400-erc-ingolstadt-l-wen-frankfurt",
@@ -879,9 +880,10 @@
     "time": "14:00",
     "home": "ERC Ingolstadt",
     "away": "Löwen Frankfurt",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 3,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-11-1630-pinguins-bremerhaven-eisb-ren-berlin",
@@ -896,9 +898,10 @@
     "time": "16:30",
     "home": "Pinguins Bremerhaven",
     "away": "Eisbären Berlin",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 0,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-11-1630-k-lner-haie-n-rnberg-ice-tigers",
@@ -913,9 +916,10 @@
     "time": "16:30",
     "home": "Kölner Haie",
     "away": "Nürnberg Ice Tigers",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-11-1630-iserlohn-roosters-grizzlys-wolfsburg",
@@ -930,9 +934,10 @@
     "time": "16:30",
     "home": "Iserlohn Roosters",
     "away": "Grizzlys Wolfsburg",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 0,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-11-1630-schwenninger-wild-wings-ehc-red-bull-m-nchen",
@@ -947,9 +952,10 @@
     "time": "16:30",
     "home": "Schwenninger Wild Wings",
     "away": "EHC Red Bull München",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 0,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-11-1900-adler-mannheim-straubing-tigers",
