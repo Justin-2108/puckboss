@@ -981,9 +981,10 @@
     "time": "19:30",
     "home": "Grizzlys Wolfsburg",
     "away": "Krefeld Pinguine",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-16-1930-iserlohn-roosters-k-lner-haie",
