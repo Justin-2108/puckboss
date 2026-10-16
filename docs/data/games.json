@@ -998,9 +998,10 @@
     "time": "19:30",
     "home": "Iserlohn Roosters",
     "away": "Kölner Haie",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-16-1930-eisb-ren-berlin-ehc-red-bull-m-nchen",
@@ -1015,9 +1016,10 @@
     "time": "19:30",
     "home": "Eisbären Berlin",
     "away": "EHC Red Bull München",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-16-1930-l-wen-frankfurt-straubing-tigers",
@@ -1032,9 +1034,10 @@
     "time": "19:30",
     "home": "Löwen Frankfurt",
     "away": "Straubing Tigers",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 0,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-16-1930-augsburger-panther-adler-mannheim",
@@ -1049,9 +1052,10 @@
     "time": "19:30",
     "home": "Augsburger Panther",
     "away": "Adler Mannheim",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-16-1930-pinguins-bremerhaven-n-rnberg-ice-tigers",
@@ -1066,9 +1070,10 @@
     "time": "19:30",
     "home": "Pinguins Bremerhaven",
     "away": "Nürnberg Ice Tigers",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-16-1930-schwenninger-wild-wings-erc-ingolstadt",
@@ -1083,9 +1088,10 @@
     "time": "19:30",
     "home": "Schwenninger Wild Wings",
     "away": "ERC Ingolstadt",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 0,
+    "awayScore": 3,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-18-1400-krefeld-pinguine-eisb-ren-berlin",
