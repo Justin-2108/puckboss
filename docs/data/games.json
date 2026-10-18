@@ -1172,7 +1172,7 @@
     "time": "16:30",
     "home": "Adler Mannheim",
     "away": "Schwenninger Wild Wings",
-    "homeScore": 0,
+    "homeScore": 1,
     "awayScore": 2,
     "status": "finished",
     "overtime": false
@@ -1190,7 +1190,7 @@
     "time": "16:30",
     "home": "ERC Ingolstadt",
     "away": "Augsburger Panther",
-    "homeScore": 4,
+    "homeScore": 6,
     "awayScore": 3,
     "status": "finished",
     "overtime": false
@@ -1208,9 +1208,10 @@
     "time": "19:00",
     "home": "Nürnberg Ice Tigers",
     "away": "EHC Red Bull München",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 4,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-20-1930-erc-ingolstadt-grizzlys-wolfsburg",
