@@ -1100,9 +1100,10 @@
     "time": "14:00",
     "home": "Krefeld Pinguine",
     "away": "Eisbären Berlin",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 0,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-18-1400-l-wen-frankfurt-iserlohn-roosters",
@@ -1117,9 +1118,10 @@
     "time": "14:00",
     "home": "Löwen Frankfurt",
     "away": "Iserlohn Roosters",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 3,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-18-1400-straubing-tigers-grizzlys-wolfsburg",
@@ -1134,9 +1136,10 @@
     "time": "14:00",
     "home": "Straubing Tigers",
     "away": "Grizzlys Wolfsburg",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-18-1630-k-lner-haie-pinguins-bremerhaven",
