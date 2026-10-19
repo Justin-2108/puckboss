@@ -1102,8 +1102,7 @@
     "away": "Eisbären Berlin",
     "homeScore": 0,
     "awayScore": 4,
-    "status": "finished",
-    "overtime": false
+    "status": "finished"
   },
   {
     "id": "regular-2026-10-18-1400-l-wen-frankfurt-iserlohn-roosters",
@@ -1120,8 +1119,7 @@
     "away": "Iserlohn Roosters",
     "homeScore": 4,
     "awayScore": 1,
-    "status": "finished",
-    "overtime": false
+    "status": "finished"
   },
   {
     "id": "regular-2026-10-18-1400-straubing-tigers-grizzlys-wolfsburg",
@@ -1138,8 +1136,7 @@
     "away": "Grizzlys Wolfsburg",
     "homeScore": 3,
     "awayScore": 2,
-    "status": "finished",
-    "overtime": false
+    "status": "finished"
   },
   {
     "id": "regular-2026-10-18-1630-k-lner-haie-pinguins-bremerhaven",
@@ -1156,8 +1153,7 @@
     "away": "Pinguins Bremerhaven",
     "homeScore": 4,
     "awayScore": 1,
-    "status": "finished",
-    "overtime": false
+    "status": "finished"
   },
   {
     "id": "regular-2026-10-18-1630-adler-mannheim-schwenninger-wild-wings",
@@ -1174,8 +1170,7 @@
     "away": "Schwenninger Wild Wings",
     "homeScore": 1,
     "awayScore": 2,
-    "status": "finished",
-    "overtime": false
+    "status": "finished"
   },
   {
     "id": "regular-2026-10-18-1630-erc-ingolstadt-augsburger-panther",
@@ -1192,8 +1187,7 @@
     "away": "Augsburger Panther",
     "homeScore": 6,
     "awayScore": 3,
-    "status": "finished",
-    "overtime": false
+    "status": "finished"
   },
   {
     "id": "regular-2026-10-18-1900-n-rnberg-ice-tigers-ehc-red-bull-m-nchen",
@@ -1210,8 +1204,7 @@
     "away": "EHC Red Bull München",
     "homeScore": 6,
     "awayScore": 2,
-    "status": "finished",
-    "overtime": false
+    "status": "finished"
   },
   {
     "id": "regular-2026-10-20-1930-erc-ingolstadt-grizzlys-wolfsburg",
