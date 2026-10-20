@@ -1231,9 +1231,10 @@
     "time": "19:30",
     "home": "ERC Ingolstadt",
     "away": "Grizzlys Wolfsburg",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 0,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-20-1930-k-lner-haie-schwenninger-wild-wings",
@@ -1248,9 +1249,10 @@
     "time": "19:30",
     "home": "Kölner Haie",
     "away": "Schwenninger Wild Wings",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 0,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-23-1930-schwenninger-wild-wings-pinguins-bremerhaven",
