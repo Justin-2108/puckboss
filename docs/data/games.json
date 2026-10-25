@@ -1421,8 +1421,8 @@
     "time": "16:30",
     "home": "Krefeld Pinguine",
     "away": "EHC Red Bull München",
-    "homeScore": 1,
-    "awayScore": 3,
+    "homeScore": 2,
+    "awayScore": 4,
     "status": "finished",
     "overtime": false
   },
@@ -1439,8 +1439,8 @@
     "time": "16:30",
     "home": "Augsburger Panther",
     "away": "Straubing Tigers",
-    "homeScore": 1,
-    "awayScore": 2,
+    "homeScore": 2,
+    "awayScore": 4,
     "status": "finished",
     "overtime": false
   },
@@ -1457,8 +1457,8 @@
     "time": "16:30",
     "home": "Iserlohn Roosters",
     "away": "Nürnberg Ice Tigers",
-    "homeScore": 1,
-    "awayScore": 3,
+    "homeScore": 2,
+    "awayScore": 4,
     "status": "finished",
     "overtime": false
   },
@@ -1475,9 +1475,10 @@
     "time": "19:00",
     "home": "Pinguins Bremerhaven",
     "away": "ERC Ingolstadt",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 5,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-27-1930-k-lner-haie-adler-mannheim",
