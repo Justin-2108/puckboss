@@ -1385,10 +1385,10 @@
     "time": "14:00",
     "home": "Löwen Frankfurt",
     "away": "Grizzlys Wolfsburg",
-    "homeScore": 0,
-    "awayScore": 1,
+    "homeScore": 1,
+    "awayScore": 2,
     "status": "finished",
-    "overtime": false
+    "overtime": true
   },
   {
     "id": "regular-2026-10-25-1400-schwenninger-wild-wings-eisb-ren-berlin",
@@ -1403,8 +1403,8 @@
     "time": "14:00",
     "home": "Schwenninger Wild Wings",
     "away": "Eisbären Berlin",
-    "homeScore": 0,
-    "awayScore": 1,
+    "homeScore": 1,
+    "awayScore": 4,
     "status": "finished",
     "overtime": false
   },
@@ -1421,9 +1421,10 @@
     "time": "16:30",
     "home": "Krefeld Pinguine",
     "away": "EHC Red Bull München",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 3,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-25-1630-augsburger-panther-straubing-tigers",
@@ -1438,9 +1439,10 @@
     "time": "16:30",
     "home": "Augsburger Panther",
     "away": "Straubing Tigers",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-25-1630-iserlohn-roosters-n-rnberg-ice-tigers",
@@ -1455,9 +1457,10 @@
     "time": "16:30",
     "home": "Iserlohn Roosters",
     "away": "Nürnberg Ice Tigers",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 3,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-25-1900-pinguins-bremerhaven-erc-ingolstadt",
