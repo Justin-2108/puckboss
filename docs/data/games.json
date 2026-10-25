@@ -1385,9 +1385,10 @@
     "time": "14:00",
     "home": "Löwen Frankfurt",
     "away": "Grizzlys Wolfsburg",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 0,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-25-1400-schwenninger-wild-wings-eisb-ren-berlin",
@@ -1402,9 +1403,10 @@
     "time": "14:00",
     "home": "Schwenninger Wild Wings",
     "away": "Eisbären Berlin",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 0,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-25-1630-krefeld-pinguine-ehc-red-bull-m-nchen",
