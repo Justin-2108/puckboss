@@ -1488,9 +1488,10 @@
     "time": "19:30",
     "home": "Kölner Haie",
     "away": "Adler Mannheim",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 5,
+    "awayScore": 6,
+    "status": "finished",
+    "overtime": true
   },
   {
     "id": "regular-2026-10-28-1930-krefeld-pinguine-schwenninger-wild-wings",
