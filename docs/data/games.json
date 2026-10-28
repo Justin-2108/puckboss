@@ -1506,9 +1506,10 @@
     "time": "19:30",
     "home": "Krefeld Pinguine",
     "away": "Schwenninger Wild Wings",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 3,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-29-1930-augsburger-panther-l-wen-frankfurt",
