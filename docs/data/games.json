@@ -1523,9 +1523,10 @@
     "time": "19:30",
     "home": "Augsburger Panther",
     "away": "Löwen Frankfurt",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 3,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": true
   },
   {
     "id": "regular-2026-10-30-1930-n-rnberg-ice-tigers-grizzlys-wolfsburg",
