@@ -1541,9 +1541,10 @@
     "time": "19:30",
     "home": "Nürnberg Ice Tigers",
     "away": "Grizzlys Wolfsburg",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 4,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-30-1930-krefeld-pinguine-k-lner-haie",
@@ -1558,9 +1559,10 @@
     "time": "19:30",
     "home": "Krefeld Pinguine",
     "away": "Kölner Haie",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 0,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-30-1930-adler-mannheim-pinguins-bremerhaven",
@@ -1575,9 +1577,10 @@
     "time": "19:30",
     "home": "Adler Mannheim",
     "away": "Pinguins Bremerhaven",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-30-1930-erc-ingolstadt-eisb-ren-berlin",
@@ -1592,9 +1595,10 @@
     "time": "19:30",
     "home": "ERC Ingolstadt",
     "away": "Eisbären Berlin",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 3,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-30-1930-iserlohn-roosters-schwenninger-wild-wings",
@@ -1609,9 +1613,10 @@
     "time": "19:30",
     "home": "Iserlohn Roosters",
     "away": "Schwenninger Wild Wings",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-10-30-1930-straubing-tigers-ehc-red-bull-m-nchen",
@@ -1626,9 +1631,10 @@
     "time": "19:30",
     "home": "Straubing Tigers",
     "away": "EHC Red Bull München",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-01-1400-eisb-ren-berlin-adler-mannheim",
