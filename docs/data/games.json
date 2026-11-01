@@ -1752,10 +1752,10 @@
     "time": "19:00",
     "home": "Kölner Haie",
     "away": "Iserlohn Roosters",
-    "homeScore": 1,
+    "homeScore": 3,
     "awayScore": 2,
     "status": "finished",
-    "overtime": false
+    "overtime": true
   },
   {
     "id": "regular-2026-11-12-1930-iserlohn-roosters-adler-mannheim",
