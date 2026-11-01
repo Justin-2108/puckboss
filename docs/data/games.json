@@ -1645,7 +1645,7 @@
     "home": "Eisbären Berlin",
     "away": "Adler Mannheim",
     "homeScore": 1,
-    "awayScore": 1,
+    "awayScore": 3,
     "status": "finished",
     "overtime": false
   },
@@ -1663,7 +1663,7 @@
     "home": "Grizzlys Wolfsburg",
     "away": "Augsburger Panther",
     "homeScore": 0,
-    "awayScore": 3,
+    "awayScore": 4,
     "status": "finished",
     "overtime": false
   },
@@ -1680,7 +1680,7 @@
     "time": "14:00",
     "home": "Pinguins Bremerhaven",
     "away": "Straubing Tigers",
-    "homeScore": 1,
+    "homeScore": 5,
     "awayScore": 2,
     "status": "finished",
     "overtime": false
@@ -1698,9 +1698,10 @@
     "time": "16:30",
     "home": "Löwen Frankfurt",
     "away": "ERC Ingolstadt",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 5,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-01-1630-schwenninger-wild-wings-krefeld-pinguine",
@@ -1715,9 +1716,10 @@
     "time": "16:30",
     "home": "Schwenninger Wild Wings",
     "away": "Krefeld Pinguine",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 4,
+    "awayScore": 3,
+    "status": "finished",
+    "overtime": true
   },
   {
     "id": "regular-2026-11-01-1630-ehc-red-bull-m-nchen-n-rnberg-ice-tigers",
@@ -1732,9 +1734,10 @@
     "time": "16:30",
     "home": "EHC Red Bull München",
     "away": "Nürnberg Ice Tigers",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-01-1900-k-lner-haie-iserlohn-roosters",
@@ -1749,9 +1752,10 @@
     "time": "19:00",
     "home": "Kölner Haie",
     "away": "Iserlohn Roosters",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-12-1930-iserlohn-roosters-adler-mannheim",
