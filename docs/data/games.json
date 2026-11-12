@@ -1765,9 +1765,10 @@
     "time": "19:30",
     "home": "Iserlohn Roosters",
     "away": "Adler Mannheim",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 6,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-13-1930-grizzlys-wolfsburg-eisb-ren-berlin",
