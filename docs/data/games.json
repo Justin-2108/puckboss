@@ -1782,9 +1782,10 @@
     "time": "19:30",
     "home": "Grizzlys Wolfsburg",
     "away": "Eisbären Berlin",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 4,
+    "awayScore": 3,
+    "status": "finished",
+    "overtime": true
   },
   {
     "id": "regular-2026-11-13-1930-krefeld-pinguine-n-rnberg-ice-tigers",
@@ -1799,9 +1800,10 @@
     "time": "19:30",
     "home": "Krefeld Pinguine",
     "away": "Nürnberg Ice Tigers",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 4,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-13-1930-l-wen-frankfurt-pinguins-bremerhaven",
@@ -1816,9 +1818,10 @@
     "time": "19:30",
     "home": "Löwen Frankfurt",
     "away": "Pinguins Bremerhaven",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 3,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-13-1930-augsburger-panther-ehc-red-bull-m-nchen",
@@ -1833,9 +1836,10 @@
     "time": "19:30",
     "home": "Augsburger Panther",
     "away": "EHC Red Bull München",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 4,
+    "awayScore": 5,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-13-1930-erc-ingolstadt-straubing-tigers",
@@ -1850,9 +1854,10 @@
     "time": "19:30",
     "home": "ERC Ingolstadt",
     "away": "Straubing Tigers",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 4,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-13-1930-schwenninger-wild-wings-k-lner-haie",
@@ -1867,9 +1872,10 @@
     "time": "19:30",
     "home": "Schwenninger Wild Wings",
     "away": "Kölner Haie",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-15-1400-ehc-red-bull-m-nchen-krefeld-pinguine",
