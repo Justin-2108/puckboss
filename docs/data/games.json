@@ -1903,9 +1903,10 @@
     "time": "14:00",
     "home": "Kölner Haie",
     "away": "Grizzlys Wolfsburg",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 4,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-15-1400-pinguins-bremerhaven-augsburger-panther",
@@ -1938,9 +1939,10 @@
     "time": "16:30",
     "home": "Kölner Haie",
     "away": "Grizzlys Wolfsburg",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 1,
+    "awayScore": 4,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-15-1630-n-rnberg-ice-tigers-iserlohn-roosters",
@@ -1955,9 +1957,10 @@
     "time": "16:30",
     "home": "Nürnberg Ice Tigers",
     "away": "Iserlohn Roosters",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 3,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": true
   },
   {
     "id": "regular-2026-11-15-1630-adler-mannheim-erc-ingolstadt",
@@ -1972,9 +1975,10 @@
     "time": "16:30",
     "home": "Adler Mannheim",
     "away": "ERC Ingolstadt",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 5,
+    "awayScore": 3,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-15-1630-straubing-tigers-l-wen-frankfurt",
@@ -1989,9 +1993,10 @@
     "time": "16:30",
     "home": "Straubing Tigers",
     "away": "Löwen Frankfurt",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 5,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-19-1930-krefeld-pinguine-straubing-tigers",
