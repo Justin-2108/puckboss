@@ -2005,9 +2005,10 @@
     "time": "19:30",
     "home": "Krefeld Pinguine",
     "away": "Straubing Tigers",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 4,
+    "awayScore": 3,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-20-1930-eisb-ren-berlin-erc-ingolstadt",
