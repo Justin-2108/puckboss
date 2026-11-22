@@ -2180,8 +2180,8 @@
     "time": "16:30",
     "home": "Adler Mannheim",
     "away": "Kölner Haie",
-    "homeScore": 3,
-    "awayScore": 1,
+    "homeScore": 4,
+    "awayScore": 2,
     "status": "finished",
     "overtime": false
   },
@@ -2198,9 +2198,10 @@
     "time": "16:30",
     "home": "Iserlohn Roosters",
     "away": "Löwen Frankfurt",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 5,
+    "awayScore": 3,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-22-1630-schwenninger-wild-wings-augsburger-panther",
@@ -2215,8 +2216,8 @@
     "time": "16:30",
     "home": "Schwenninger Wild Wings",
     "away": "Augsburger Panther",
-    "homeScore": 1,
-    "awayScore": 2,
+    "homeScore": 4,
+    "awayScore": 5,
     "status": "finished",
     "overtime": false
   },
@@ -2233,9 +2234,10 @@
     "time": "19:00",
     "home": "Krefeld Pinguine",
     "away": "Grizzlys Wolfsburg",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 4,
+    "awayScore": 0,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-24-1930-eisb-ren-berlin-l-wen-frankfurt",
