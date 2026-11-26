@@ -2367,9 +2367,10 @@
     "time": "19:30",
     "home": "Löwen Frankfurt",
     "away": "Adler Mannheim",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 0,
+    "awayScore": 4,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-27-1930-k-lner-haie-straubing-tigers",
