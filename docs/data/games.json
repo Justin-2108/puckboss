@@ -2384,9 +2384,10 @@
     "time": "19:30",
     "home": "Kölner Haie",
     "away": "Straubing Tigers",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 3,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": true
   },
   {
     "id": "regular-2026-11-27-1930-augsburger-panther-eisb-ren-berlin",
@@ -2401,9 +2402,10 @@
     "time": "19:30",
     "home": "Augsburger Panther",
     "away": "Eisbären Berlin",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 6,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-27-1930-pinguins-bremerhaven-schwenninger-wild-wings",
@@ -2418,9 +2420,10 @@
     "time": "19:30",
     "home": "Pinguins Bremerhaven",
     "away": "Schwenninger Wild Wings",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 3,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-27-1930-erc-ingolstadt-krefeld-pinguine",
@@ -2435,9 +2438,10 @@
     "time": "19:30",
     "home": "ERC Ingolstadt",
     "away": "Krefeld Pinguine",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 3,
+    "awayScore": 2,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-27-1930-iserlohn-roosters-ehc-red-bull-m-nchen",
@@ -2452,9 +2456,10 @@
     "time": "19:30",
     "home": "Iserlohn Roosters",
     "away": "EHC Red Bull München",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 1,
+    "status": "finished",
+    "overtime": true
   },
   {
     "id": "regular-2026-11-27-1930-grizzlys-wolfsburg-n-rnberg-ice-tigers",
@@ -2469,9 +2474,10 @@
     "time": "19:30",
     "home": "Grizzlys Wolfsburg",
     "away": "Nürnberg Ice Tigers",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled"
+    "homeScore": 2,
+    "awayScore": 3,
+    "status": "finished",
+    "overtime": false
   },
   {
     "id": "regular-2026-11-29-1400-k-lner-haie-erc-ingolstadt",
